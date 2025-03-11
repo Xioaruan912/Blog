@@ -4,6 +4,8 @@
 
 [*just stand there*](https://music.163.com/#/song?id=2623416927)
 
+[*October Weekend*](https://music.163.com/#/song?id=1325624674)
+
 # OUT
 
 [*TWO SUGARS*](https://music.163.com/#/mv?id=14563460)
