@@ -4,20 +4,14 @@
 
 typedef int ElemType;
 
+//顺序表结构体
 typedef struct Sqlist{
 	ElemType data[MAXSIZE];  //初始化数组
 	ElemType length;   //当前元素长度
 }Sqlist;
 
-void test_arg(Sqlist *L){  //生成测试数据
-	for(int i = 0 ; i < MAXSIZE ; i ++){
-		int constant = 10 + i;
-		L->data[i] = constant;   //这里使用指针需要用 -> 而不是.
-		L->length ++ ;  
-	}
-}
-
-void Get_arg(Sqlist L){  // 遍历顺序表
+// 遍历顺序表
+void Get_arg(Sqlist L){  
 	for(int i=0 ; i < L.length ; i++){
 		printf("L顺序表第%d个元素为%d\n",i,L.data[i]);
 	}
@@ -39,11 +33,8 @@ void InsertSqlist(Sqlist *L, int k, int X){
 	L->length++;
 	return;
 }
-
-
 void main(){
 	Sqlist L = {{1,2,3,4},4};
-//	test_arg(&L);  //这里需要传入地址 因为需要修改L
 	printf("修改之前\n");
 	Get_arg(L);
 	InsertSqlist(&L,4,100);
@@ -97,20 +88,14 @@ k = 2 的时候 我们比对 如果 i > k 就继续 否则 结束
 
 typedef int ElemType;
 
+//顺序表结构体
 typedef struct Sqlist{
 	ElemType data[MAXSIZE];  //初始化数组
 	ElemType length;   //当前元素长度
 }Sqlist;
 
-void test_arg(Sqlist *L){  //生成测试数据
-	for(int i = 0 ; i < MAXSIZE ; i ++){
-		int constant = 10 + i;
-		L->data[i] = constant;   //这里使用指针需要用 -> 而不是.
-		L->length ++ ;  
-	}
-}
-
-void Get_arg(Sqlist L){  // 遍历顺序表
+// 遍历顺序表
+void Get_arg(Sqlist L){  
 	for(int i=0 ; i < L.length ; i++){
 		printf("L顺序表第%d个元素为%d\n",i,L.data[i]);
 	}
@@ -135,7 +120,6 @@ void InsertSqlist(Sqlist *L, int k, int X){
 }
 void main(){
 	Sqlist L = {{1,2,3,4},4};
-//	test_arg(&L);  //这里需要传入地址 因为需要修改L
 	printf("修改之前\n");
 	Get_arg(L);
 	InsertSqlist(&L,4,100);
