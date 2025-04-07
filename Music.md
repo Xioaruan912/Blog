@@ -25,3 +25,6 @@
 [**野风筝**](https://music.163.com/song?id=2166486002&uct2=U2FsdGVkX1/XTSkKJg+dlbf/QY5FBbyXEOkBlOofWIg=)
 
 [梦](https://music.163.com/song?id=1901319328&uct2=U2FsdGVkX195rLIPcbGmcd1DnYgnxIC0oeDT8gMDBcU=)
+
+[4 U](https://music.163.com/song?id=2066418102&uct2=U2FsdGVkX1+SrFSBFypfpl/w/dseW7joyPV8yC9+u1w=)
+
