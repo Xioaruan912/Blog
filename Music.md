@@ -28,3 +28,6 @@
 
 [4 U](https://music.163.com/song?id=2066418102&uct2=U2FsdGVkX1+SrFSBFypfpl/w/dseW7joyPV8yC9+u1w=)
 
+[我的灵魂是个哑巴](https://music.163.com/song?id=2163391649&uct2=U2FsdGVkX1/jpsEd8HZNW7UsankIiFPIT82/fwIXLGU=)
+
+[DAY1](https://music.163.com/song?id=1492864083&uct2=U2FsdGVkX1/h2EQItaux+OyJLVT07Qz5uGFmrOeJJAw=)
