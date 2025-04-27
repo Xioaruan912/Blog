@@ -339,6 +339,12 @@ proxy-groups:
 
 ![image-20250427140156854](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140156854.png)
 
+或者实现url_test 自动选择最好的节点
+
+```
+  - { name: "USA", type: url-test, proxies: [/USA/],url: "http://chatgpt.com", interval: 86400 } 
+```
+
 然后对GPT的网站指定代理组
 
 ```
