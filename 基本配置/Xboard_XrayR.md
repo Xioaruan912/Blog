@@ -309,3 +309,60 @@ ls
 database.sqlite  redis
 ```
 
+# Clash配置
+
+新版本可以在后台进行配置文件修改
+
+![image-20250427135922656](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427135922656.png)
+
+如果为旧版本
+
+需要进入docker 容器中 使用vscode可以简易进行操作
+
+```
+/www/resources/ruls/
+```
+
+![image-20250427140059999](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140059999.png)
+
+## GPT分流美国
+
+首先正则化匹配美国节点 
+
+```
+proxy-groups:
+  - { name: "$app_name", type: select, proxies: ["自动选择", "故障转移"] }
+  - { name: "自动选择", type: url-test, proxies: [], url: "http://www.gstatic.com/generate_204", interval: 86400 }
+  - { name: "故障转移", type: fallback, proxies: [], url: "http://www.gstatic.com/generate_204", interval: 7200 }
+  - { name: "USA", type: select, proxies: [/USA/] } 
+```
+
+![image-20250427140156854](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140156854.png)
+
+然后对GPT的网站指定代理组
+
+```
+  - DOMAIN,hackthebox.com,USA
+  - DOMAIN,ip.sb,USA
+  - DOMAIN,ipv4.ip.sb,USA
+  - DOMAIN,ab.chatgpt.com,USA
+  - DOMAIN,chatgpt.com,USA
+  - DOMAIN,platform.openai.com,USA
+  - DOMAIN,openai.com,USA
+  - DOMAIN,cdn.openai.com,USA
+  - DOMAIN,api.openai.com,USA
+```
+
+可以访问ip.sb看看是不是分流成功
+
+这样 clash选择策略 ->自动选择 
+
+访问GPT网站即可实现美国节点访问
+
+可以在clash链接中查看是否生效
+
+![image-20250427140347338](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140347338.png)
+
+可以在美国代理组中选择节点
+
+![image-20250427140434113](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140434113.png)
