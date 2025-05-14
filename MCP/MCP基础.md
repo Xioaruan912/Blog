@@ -83,7 +83,7 @@ github.com/mrexodia/ida-pro-mcp
 这是通过Rust写的 python包管理器 用于代替 pip
 
 ```
-curl -LsSf https://astral.sh/uv/install.sh | sh
+  curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ![image-20250514091406703](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250514091406703.png)
