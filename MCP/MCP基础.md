@@ -676,3 +676,79 @@ finally:
 这样我们就知道了 MCP和 MCP host之间的传递 我们可以直接通过控制台实现调试MCP服务 只需要传递Cline的输入给 MCP 就可以实现脱离Cline实现对话
 
 ![image-20250514104413961](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250514104413961.png)
+
+# MCP服务调试 
+
+对写好的MCP服务进行调试
+
+首先安装node 这里是macos 通过nvm安装
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+```
+
+```
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
+```
+
+检查安装
+
+```
+nvm -v  
+```
+
+安装node
+
+```
+nvm install node  
+```
+
+然后就可以了 去 mcp服务下 启动
+
+```
+mcp dev server.py  
+```
+
+这里需要前面是通过 **uv add “mcp[cli]”** 安装的
+
+![image-20250514145354996](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250514145354996.png)
+
+这里我们就可以完整的看到交互了
+
+# 踩坑
+
+其实是python语言写的问题 记录在这吧
+
+## exceptions must derive from BaseException
+
+这里是因为 我直接 raise 了 cmd 写错了。raise 只能返回错误
+
+并且 最好是自定义返回结果
+
+```
+class scanError(Exception):
+ def __init__(self, message: str, result: dict | None = None):
+        super().__init__(message)     # 让 str(e) 仍然是 message
+        self.result = result          # 额外挂载自定义属性
+```
+
+然后调用
+
+```
+if scan_error:
+	raise scanErro("扫描失败", result)
+```
+
+## Error executing tool information_search: 'coroutine' object has no attribute 'communicate'
+
+因为 proc 忘记加 await
+
+```
+    proc = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout= asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE  
+    )
+```
+
