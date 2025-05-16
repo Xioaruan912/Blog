@@ -1,3 +1,7 @@
+
+
+# Windows
+
 ```
 https://github.com/tonsky/FiraCode
 ```
@@ -28,3 +32,18 @@ https://github.com/tonsky/FiraCode
 ```
 
 ![image-20250516105339471](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250516105339471.png)
+
+# Macos
+
+```
+brew tap homebrew/cask-fonts
+brew install --cask  font-fira-code
+```
+
+去vscode 的设置中搜索font
+
+```
+'Fira Code', Consolas, 'Microsoft Yahei'
+```
+
+![image-20250516172414623](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250516172414623.png)
