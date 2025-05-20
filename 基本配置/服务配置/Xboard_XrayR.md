@@ -372,3 +372,134 @@ proxy-groups:
 可以在美国代理组中选择节点
 
 ![image-20250427140434113](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250427140434113.png)
+
+# 双节点
+
+```
+Nodes:
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "xxxxxxxx"
+      ApiKey: "xxxxxxx"
+      NodeID: 16
+      NodeType: Shadowsocks
+      Timeout: 30
+      EnableVless: true
+      VlessFlow: "xtls-rprx-vision"
+      SpeedLimit: 0
+      DeviceLimit: 0
+      RuleListPath:
+      DisableCustomConfig: false
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+      AutoSpeedLimitConfig:
+        Limit: 0
+        WarnTimes: 0
+        LimitSpeed: 0
+        LimitDuration: 0
+      GlobalDeviceLimitConfig:
+        Enable: false
+        RedisNetwork: tcp
+        RedisAddr: 127.0.0.1:6379
+        RedisUsername:
+        RedisPassword: YOUR PASSWORD
+        RedisDB: 0
+        Timeout: 5
+        Expiry: 60
+      EnableFallback: false
+      FallBackConfigs: []
+      DisableLocalREALITYConfig: true
+      EnableREALITY: true
+      REALITYConfigs:
+        Show: true
+        Dest: www.amazon.com:443
+        ProxyProtocolVer: 0
+        ServerNames:
+          - www.amazon.com
+        PrivateKey: YOUR_PRIVATE_KEY
+        MinClientVer:
+        MaxClientVer:
+        MaxTimeDiff: 0
+        ShortIds:
+          - ""
+          - 0123456789abcdef
+      CertConfig:
+        CertMode: dns
+        CertDomain: "node1.test.com"
+        CertFile: /etc/XrayR/cert/node1.test.com.cert
+        KeyFile: /etc/XrayR/cert/node1.test.com.key
+        Provider: alidns
+        Email: test@me.com
+        DNSEnv:
+          ALICLOUD_ACCESS_KEY: aaa
+          ALICLOUD_SECRET_KEY: bbb
+
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "xxxxxx"
+      ApiKey: "x x x x"
+      NodeID: 2
+      NodeType: Vless
+      Timeout: 30
+      EnableVless: true
+      VlessFlow: "xtls-rprx-vision"
+      SpeedLimit: 0
+      DeviceLimit: 0
+      RuleListPath:
+      DisableCustomConfig: false
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+      AutoSpeedLimitConfig:
+        Limit: 0
+        WarnTimes: 0
+        LimitSpeed: 0
+        LimitDuration: 0
+      GlobalDeviceLimitConfig:
+        Enable: false
+        RedisNetwork: tcp
+        RedisAddr: 127.0.0.1:6379
+        RedisUsername:
+        RedisPassword: YOUR PASSWORD
+        RedisDB: 0
+        Timeout: 5
+        Expiry: 60
+      EnableFallback: false
+      FallBackConfigs: []
+      DisableLocalREALITYConfig: true
+      EnableREALITY: true
+      REALITYConfigs:
+        Show: true
+        Dest: www.amazon.com:443
+        ProxyProtocolVer: 0
+        ServerNames:
+          - www.amazon.com
+        PrivateKey: YOUR_PRIVATE_KEY
+        MinClientVer:
+        MaxClientVer:
+        MaxTimeDiff: 0
+        ShortIds:
+          - ""
+          - 0123456789abcdef
+      CertConfig:
+        CertMode: dns
+        CertDomain: "node2.test.com"
+        CertFile: /etc/XrayR/cert/node2.test.com.cert
+        KeyFile: /etc/XrayR/cert/node2.test.com.key
+        Provider: alidns
+        Email: test@me.com
+        DNSEnv:
+          ALICLOUD_ACCESS_KEY: aaa
+          ALICLOUD_SECRET_KEY: bbb
+
+```
+
