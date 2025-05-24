@@ -26,4 +26,4 @@ https://zstaticcdn.com/nodes
 
 记住复制进去后需要增加80端口
 
-![image-20250524133024447](../../../../Library/Application%20Support/typora-user-images/image-20250524133024447.png)
+![image-20250524133024447](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250524133024447.png)
