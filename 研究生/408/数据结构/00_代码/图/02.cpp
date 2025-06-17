@@ -1,0 +1,80 @@
+
+
+//=====================================================使用邻接矩阵创建一个有向、无向图
+#include <stdio.h>
+#define maxsize 10
+typedef struct mGraph
+{
+    int numver, numedge;
+    int vertical[maxsize];
+    int edges[maxsize][maxsize];
+} mGraph;
+
+mGraph create_mGraph(int numedge) // 传入有几条边
+{
+    mGraph G;
+    G.numedge = numedge;
+    // 初始化
+    for (int i = 0; i < maxsize; i++)
+    {
+        for (int j = 0; j < maxsize; j++)
+        {
+            G.edges[i][j] = 0;
+        }
+    }
+    for (int i = 0; i < G.numedge; i++)
+    {
+        int v1, v2;
+        scanf("%d %d", &v1, &v2);
+        G.edges[v1][v2] = 1;
+        // 无向图的
+        G.edges[v2][v1] = 1;
+    }
+    return G;
+}
+
+//=====================================================使用邻接表创建一个有向、无向图
+#include <stdio.h>
+#include <stdlib.h>
+// 邻接表结构体
+#define maxsize 10
+typedef struct ANode
+{
+    int adjvex;
+    struct ANode *nextarc;
+} ANode, *Node;
+
+typedef struct VNode
+{
+    char data;
+    ANode *firstarc;
+} VNode;
+
+typedef struct Graph
+{
+    int numver;
+    int numedge;
+    VNode adjlist[maxsize];
+} Graph;
+
+// 创建邻接表
+Graph create_Graph(int n, int m) // 传入创建几个节点 几个边
+{
+    Graph G;
+    G.numver = n;
+    for (int i = 0; i < n; i++)
+    {
+        G.adjlist[i].firstarc = NULL;
+    }
+    for (int i = 0; i < m; i++)
+    {
+        int v1, v2;
+        scanf("%d %d", &v1, &v2);
+        ANode *p = (Node)malloc(sizeof(ANode));
+        // 头插法
+        p->adjvex = v2;
+        p->nextarc = G.adjlist[v1].firstarc;
+        G.adjlist[v1].firstarc = p;
+    }
+    return G;
+}
