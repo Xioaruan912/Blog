@@ -290,9 +290,23 @@ fi
 
 使用docker命令进入容器
 
-```
+```shell
 docker exec -it  DOCKER_ID /bin/sh
+tar czf /tmp/data.tar.gz -C /www/ .docker
+docker cp 容器ID:/tmp/data.tar.gz /home/youruser/backup/data.tar.gz
+
 ```
+
+## 恢复
+
+```
+docker cp /home/youruser/backup/data.tar.gz cf6fba019a02:/tmp/data.tar.gz
+docker exec -it cf6fba019a02 /bin/sh
+mkdir -p /www/.docker
+tar xzf /tmp/data.tar.gz -C /www/.docker --strip-components=1
+```
+
+
 
 ```
 只需要备份database.sqlite就行
