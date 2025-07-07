@@ -27,3 +27,15 @@ https://zstaticcdn.com/nodes
 记住复制进去后需要增加80端口
 
 ![image-20250524133024447](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250524133024447.png)
+
+或者
+
+https://digvps.com/depoly/nezha#%E5%BB%B6%E8%BF%9F%E7%9B%91%E6%8E%A7ip
+
+# 公开简介
+
+https://nezhajsontools.pages.dev/
+
+# 流量告警
+
+https://wiziscool.github.io/Nezha-Traffic-Alarm-Generator/
