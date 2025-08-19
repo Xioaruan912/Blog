@@ -1,3 +1,7 @@
+# Nezha探针
+
+**目前暂停使用 使用 Komari探针**
+
 ```
 curl -L https://raw.githubusercontent.com/nezhahq/scripts/refs/heads/main/install.sh -o nezha.sh && chmod +x nezha.sh && sudo ./nezha.sh
 ```
