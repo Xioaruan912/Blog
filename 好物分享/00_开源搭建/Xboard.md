@@ -1839,3 +1839,14 @@ for d in d1.awsstatic.com ms-vscode.gallerycdn.vsassets.io www.oracle.com ts4.tc
 for d in c.s-microsoft.com www.apple.com apps.apple.com acctcdn.msftauth.net www.aws.com statici.icloud.com gsp-ssl.ls.apple.com visualstudio.microsoft.com tag-logger.demandbase.com res-1.cdn.office.net ; do t1=$(date +%s%3N); timeout 1 openssl s_client -connect $d:443 -servername $d </dev/null &>/dev/null && t2=$(date +%s%3N) && echo "$d: $((t2 - t1)) ms" || echo "$d: timeout"; done
 ```
 
+# DNS泄露问题
+
+在我上面的Clash配置文件后
+
+
+
+![image-20250913000408858](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250913000408858.png)
+
+开启遵循路由即可
+
+![image-20250913000428092](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250913000428092.png)
