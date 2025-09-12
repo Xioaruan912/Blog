@@ -3,3 +3,7 @@ https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions---You
 https://github.com/python-telegram-bot/python-telegram-bot
 
 https://docs.python-telegram-bot.org/en/stable/examples.html
+
+https://core.telegram.org/bots/api
+
+https://docs.python-telegram-bot.org/en/stable/
