@@ -15,6 +15,10 @@ git-auto-push.ps1
 
 ```
 # 询问用户输入提交信息
+Write-Host "`n✅ 开始执行 git pull 拉取仓库内容" -ForegroundColor Green
+
+git pull 
+
 $commitMessage = Read-Host "请输入本次提交的评论"
 
 # 确认当前目录是否是 Git 仓库
