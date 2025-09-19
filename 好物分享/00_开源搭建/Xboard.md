@@ -518,7 +518,7 @@ dns:
 proxies:
 
 proxy-groups:
-  - { name: "🔄$app_name", type: select, proxies: ["自动选择", "故障转移"] }
+  - { name: "🔄$app_name", type: select, proxies: ["自动选择", "故障转移", "负载均衡"] }
   - { name: "💬ChatGPT", type: url-test, proxies: [/USA/],
       url: "https://chat.openai.com",
       interval: 600, timeout: 3000, tolerance: 80 }
@@ -529,98 +529,9 @@ proxy-groups:
   - { name: "故障转移", type: fallback, proxies: [],
       url: "https://www.gstatic.com/generate_204",
       interval: 600, timeout: 3000 }
-
-rule-providers:
-  reject:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
-    path: ./ruleset/reject.yaml
-    interval: 86400
-
-  icloud:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
-    path: ./ruleset/icloud.yaml
-    interval: 86400
-
-  apple:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
-    path: ./ruleset/apple.yaml
-    interval: 86400
-
-  google:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
-    path: ./ruleset/google.yaml
-    interval: 86400
-
-  proxy:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
-    path: ./ruleset/proxy.yaml
-    interval: 86400
-
-  direct:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
-    path: ./ruleset/direct.yaml
-    interval: 86400
-
-  private:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
-    path: ./ruleset/private.yaml
-    interval: 86400
-
-  gfw:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
-    path: ./ruleset/gfw.yaml
-    interval: 86400
-
-  tld-not-cn:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
-    path: ./ruleset/tld-not-cn.yaml
-    interval: 86400
-
-  telegramcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
-    path: ./ruleset/telegramcidr.yaml
-    interval: 86400
-
-  cncidr:
-    type: http
-    behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
-    path: ./ruleset/cncidr.yaml
-    interval: 86400
-
-  lancidr:
-    type: http
-    behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
-    path: ./ruleset/lancidr.yaml
-    interval: 86400
-
-  applications:
-    type: http
-    behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
-    path: ./ruleset/applications.yaml
-    interval: 86400
+  - { name: "负载均衡", type: load-balance, proxies: [/USA/,/HK/,/TW/, /SG/, /JP/],
+      url: "https://www.gstatic.com/generate_204",
+      interval: 300, strategy: round-robin }
 rules:
   - DOMAIN-SUFFIX,dns.alidns.com,🔄$app_name
   - DOMAIN-SUFFIX,doh.pub,🔄$app_name
@@ -1641,19 +1552,8 @@ rules:
   - IP-CIDR6,fe80::/10,DIRECT
 
   # 剩余未匹配的国内网站
-  - RULE-SET,applications,DIRECT,no-resolve
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
-  - RULE-SET,private,DIRECT,no-resolve
-  - RULE-SET,reject,REJECT,no-resolve
-  - RULE-SET,icloud,DIRECT,no-resolve
-  - RULE-SET,apple,DIRECT,no-resolve
-  - RULE-SET,google,🔄$app_name,no-resolve
-  - RULE-SET,proxy,🔄$app_name,no-resolve
-  - RULE-SET,direct,DIRECT,no-resolve
-  - RULE-SET,lancidr,DIRECT,no-resolve
-  - RULE-SET,cncidr,DIRECT,no-resolve
-  - RULE-SET,telegramcidr,🔄$app_name,no-resolve
   - GEOIP,LAN,DIRECT,no-resolve
   - GEOIP,CN,DIRECT,no-resolve
   - MATCH,🔄$app_name
@@ -1850,3 +1750,45 @@ for d in c.s-microsoft.com www.apple.com apps.apple.com acctcdn.msftauth.net www
 开启遵循路由即可
 
 ![image-20250913000428092](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250913000428092.png)
+
+# 负载均衡
+
+配置文件中添加如下即可
+
+```
+proxy-groups:
+  - { name: "🔄$app_name", type: select, proxies: ["自动选择", "故障转移", "负载均衡"] }
+  - { name: "💬ChatGPT", type: url-test, proxies: [/USA/],
+      url: "https://chat.openai.com",
+      interval: 600, timeout: 3000, tolerance: 80 }
+  - { name: "🎬Netflix", type: select, proxies: [/SG/, /JP/] }
+  - { name: "自动选择", type: url-test, proxies: [],
+      url: "https://www.gstatic.com/generate_204",
+      interval: 300, timeout: 3000, tolerance: 80 }
+  - { name: "故障转移", type: fallback, proxies: [],
+      url: "https://www.gstatic.com/generate_204",
+      interval: 600, timeout: 3000 }
+  - { name: "负载均衡", type: load-balance, proxies: [/USA/,/HK/,/TW/, /SG/, /JP/],
+      url: "https://www.gstatic.com/generate_204",
+      interval: 300, strategy: round-robin }
+```
+
+# UDP代理
+
+https://browserleaks.com/webrtc
+
+进行检测 可以很容易发现没有走代理 这是因为本网页发起 Stun请求 走的是UDP 但是UDP不走代理 所以是直连访问
+
+![image-20250917160234649](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250917160234649.png)
+
+最简单的方法就是开启TUN模式 这样你的全局都是走Clash代理 UDP TCP均是
+
+![image-20250917160804045](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250917160804045.png)
+
+在我开启TUN模式后 如图所示
+
+当然要求你的节点开启UDP
+
+![image-20250917160950897](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250917160950897.png)
+
+所以我们游戏加速器 只要开启TUN即可
