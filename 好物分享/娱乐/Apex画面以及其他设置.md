@@ -1,7 +1,7 @@
 # 启动项
 
 ```
-+fps_max 100 +cl_showpos 1 -novid -dev +cl_fovScale "1.7" +cl_showfps 1 -notimeout
++building_cubemaps 1 +cl_fovScale "1.7" +fps_max unlimited +lobby_max_fps 0 -novid +cl_showpos 1 +cl_is_softened locale 1 -no_render_on_input_thread
 ```
 
 # 视频配置
@@ -21,7 +21,7 @@
 	"setting.particle_cpu_level"		"0"
 	"setting.r_createmodeldecals"		"0"
 	"setting.r_decals"		"0"
-	"setting.r_lod_switch_scale"		"0.6"
+	"setting.r_lod_switch_scale"		"0.600000"
 	"setting.shadow_enable"		"0"
 	"setting.shadow_depth_dimen_min"		"0"
 	"setting.shadow_depth_upres_factor_max"		"0"
@@ -35,7 +35,7 @@
 	"setting.last_display_width"		"1920"
 	"setting.last_display_height"		"1080"
 	"setting.nowindowborder"		"1"
-	"setting.fullscreen"		"0"
+	"setting.fullscreen"		"1"
 	"setting.defaultres"		"1920"
 	"setting.defaultresheight"		"1080"
 	"setting.volumetric_lighting"		"0"
