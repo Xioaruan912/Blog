@@ -28,14 +28,18 @@ apt install unzip curl wget git sudo -y
 安装 转发脚本
 
 ```
-wget -qO- https://ghfast.top/https://raw.githubusercontent.com/zywe03/realm-xwPF/main/xwPF.sh | bash -s install
+curl -sSL -o realm.sh "https://raw.githubusercontent.com/Xioaruan912/Xcript/main/sh/realm.sh" && chmod +x realm.sh && ./realm.sh && rm realm.sh
 ```
-
-安装完毕后 通过 pf 打开快速设置
 
 这里就暂时配置完毕
 
 # IX配置
+
+也可以dd  安装脚本
+
+```
+curl -sSL -o realm.sh "https://raw.githubusercontent.com/Xioaruan912/Xcript/main/sh/realm.sh" && chmod +x realm.sh && ./realm.sh && rm realm.sh
+```
 
 
 
