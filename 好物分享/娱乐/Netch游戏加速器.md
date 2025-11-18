@@ -14,7 +14,7 @@ https://github.com/netchx/netch
 
 点击模式 创建进程模式
 
-![image-20250917163520815](../../../../../AppData/Roaming/Typora/typora-user-images/image-20250917163520815.png)
+![image-20250917163520815](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20250917163520815.png)
 
 选择steamapps的文件夹 就是游戏文件夹
 
