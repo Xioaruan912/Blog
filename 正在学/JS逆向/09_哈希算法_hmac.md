@@ -20,7 +20,7 @@ console.log(sha1('12312313'))
 
 # 实战
 
-https:/qcc.com
+`https:/qcc.com`
 
 ![image-20260113105420428](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260113105420428.png)
 
@@ -103,8 +103,6 @@ console.log(res)
 
 头部的逆向分析 结束 加密内容 就是一样的过程
 只是混淆不同
-
-加入了：
 
 `window,tid`和`n + "pathString" + i + t,o.default(n)`
 
