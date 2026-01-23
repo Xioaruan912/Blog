@@ -26,7 +26,7 @@ console.log(enctext)
 
 # 实战1
 
-https://passport2.chaoxing.com/login?fid=&newversion=true&refer=https%3A%2F%2Fi.chaoxing.com
+`https://passport2.chaoxing.com/login?fid=&newversion=true&refer=https%3A%2F%2Fi.chaoxing.com`
 
 ![image-20260115093332551](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260115093332551.png)
 
@@ -60,7 +60,7 @@ function encryptByAES(message, key) {
 
 # 实战2
 
-https://jzsc.mohurd.gov.cn/data/company
+`https://jzsc.mohurd.gov.cn/data/company`
 
 ![image-20260115094205336](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260115094205336.png)
 
@@ -130,7 +130,7 @@ XHR断点 我们直接断API 然后查找
 
 # 实战3
 
-https://cas.hebau.edu.cn/authserver/login
+`https://cas.hebau.edu.cn/authserver/login`
 
 ![image-20260115101135709](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260115101135709.png)
 

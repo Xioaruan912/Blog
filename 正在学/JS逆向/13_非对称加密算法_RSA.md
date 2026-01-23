@@ -96,7 +96,7 @@ console.log("dec =", dec);
 
 # 实战1
 
-https://tms.newchinalife.com/ex//app/login/login.jsp
+`https://tms.newchinalife.com/ex//app/login/login.jsp`
 
 ![image-20260116111604914](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260116111604914.png)
 
@@ -143,7 +143,7 @@ console.log(value);
 
 # 实战2
 
-https://passport.suning.com/ids/login
+`https://passport.suning.com/ids/login`
 
 直接走启动器 跟`ajax`的栈 就可以找到
 

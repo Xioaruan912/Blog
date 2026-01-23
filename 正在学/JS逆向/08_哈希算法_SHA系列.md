@@ -29,7 +29,7 @@ console.log(sha1('12312313'))
 
 # 混合哈希的实战 SHA+MD5
 
-https://www.cls.cn/depth?id=1000
+`https://www.cls.cn/depth?id=1000`
 
 ![image-20260110214429304](https://raw.githubusercontent.com/Xioaruan912/pic/main/image-20260110214429304.png)
 
@@ -81,7 +81,7 @@ console.log(sha1('app=CailianpressWeb&hasFirstVipArticle=1&lastTime=1768053297&o
 
 # 实战2 SHA1+salt
 
-https://aerfaying.com/
+`https://aerfaying.com/`
 
 ```
 console.log("b0661d22276577acc4284315a30fad5bb12b4bcf".length)
@@ -130,7 +130,7 @@ sha1(路径?username=xx&password=xxx盐值&&时间戳=)
 
 # 实战3
 
-https://v.6.cn/channel/index.php
+`https://v.6.cn/channel/index.php`
 
 测试登入逆向
 
