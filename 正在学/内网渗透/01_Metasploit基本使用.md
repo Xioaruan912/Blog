@@ -19,7 +19,7 @@ sudo apt install -y curl git gnupg2
 
 # 下载官方安装脚本
 echo "[3/5] 下载 Metasploit 安装脚本..."
-curl -fsSL https://raw.githubusercontent.com/rapid7/metasploit-framework/master/msfinstall -o msfinstall
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
 
 # 赋予执行权限
 chmod +x msfinstall
