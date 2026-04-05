@@ -128,12 +128,12 @@ https://github.com/frida/frida/tags
 下载好了 那么所有的都构建完毕了 现在只需要 安装即可
 
 ```
-adb push .\frida-server-17.8.3-android-x86_64 /data/local/tmp/fsx86
+adb push .\frida-server-17.8.3-android-arm64 /data/local/tmp/fsarm
 adb root
 adb shell
 > cd /data/local/tmp
-> chmod 777 fsx86
-> ./fsx86
+> chmod 777 fsarm
+> ./fsarm
 ```
 
 那么这样就实现了 等待 那么我们下面验证是否成功 【注意窗口不要关闭】
