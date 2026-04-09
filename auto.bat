@@ -1,6 +1,6 @@
 @echo off
 
-cd /d C:\Users\12455\Desktop\Blog
+cd /d C:\Users\Xioa\Desktop\Blog
 
 git add .
 
