@@ -1,15 +1,14 @@
 @echo off
-:: 设置字符集为 UTF-8，解决中文乱码问题
+:: 强制开启 UTF-8 支持中文显示
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 :: --- 配置区域 ---
 set "REPO_PATH=C:\Users\Xioa\Desktop\Blog"
 set "BRANCH=main"
-set "TIME_STAMP=%date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,8%"
+set "TIME_STAMP=%DATE% %TIME%"
 
-:: 窗口设置
-title Blog Auto-Sync Tool
+title Blog Auto-Sync Tool (Modern Edition)
 mode con cols=85 lines=25
 color 0B
 
@@ -26,7 +25,7 @@ echo.
 :: 1. 路径检测
 if not exist "%REPO_PATH%" (
     color 0C
-    echo [ERROR] 找不到指定的路径，请检查脚本中的 REPO_PATH 设置。
+    echo [ERROR] 找不到指定的路径，请检查脚本配置。
     pause
     exit
 )
@@ -44,45 +43,63 @@ if %errorlevel%==0 (
     echo ---------------------------------------------------------------------
     echo [DONE] 状态: 没有任何变更需要同步。
     echo ---------------------------------------------------------------------
-    timeout /t 5
-    goto END
+    goto FINAL_COUNTDOWN
 )
 
-:: 3. 交互式确认
+:: 3. 交互式确认 (使用 Choice 避免乱码报错)
 echo ---------------------------------------------------------------------
 echo [!] 检测到本地代码仓存在更新。
-set /p "choice=>> 是否立即同步到远程仓库? [Y/N]: "
-if /I not "%choice%"=="Y" (
+echo [?] 是否立即同步到远程仓库?
+choice /c YN /m ">> [Y]确认同步, [N]取消操作: "
+
+if %errorlevel% equ 2 (
+    echo.
     echo [!] 操作已由用户取消。
-    timeout /t 3
-    goto END
+    goto FINAL_COUNTDOWN
 )
 
 :: 4. 执行提交与推送
 echo.
-echo [1/2] 正在创建本地提交...
+echo [1/2] 正在创建提交...
 git commit -m "Auto-update: %TIME_STAMP%"
 
-echo [2/2] 正在推送到远程仓库 [%BRANCH%]...
+echo [2/2] 正在推送至远程 [%BRANCH%]...
 git push origin %BRANCH%
 
 if %errorlevel% equ 0 (
     color 0A
     echo.
     echo =====================================================================
-    echo SUCCESS: 同步任务圆满完成！
+    echo SUCCESS: 同步完成！
     echo =====================================================================
 ) else (
     color 0C
     echo.
     echo =====================================================================
-    echo ERROR: 推送失败！请检查网络、SSH Key 或远程仓库权限。
+    echo ERROR: 推送失败，请检查网络或权限。
     echo =====================================================================
-    pause
 )
 
-:END
+:FINAL_COUNTDOWN
 echo.
-echo 脚本将在 3 秒后自动关闭...
-timeout /t 3 > nul
+echo ---------------------------------------------------------------------
+echo [*] 脚本任务结束。
+echo [!] 提示：将在 3 秒后自动关闭。
+echo [?] 如果需要查看日志，请在 3 秒内按 [S] 键停止关闭。
+echo ---------------------------------------------------------------------
+
+:: 使用 choice 设置 3 秒超时，默认执行退出 (T)，按 S 键拦截
+choice /c ST /t 3 /d T /n >nul
+
+:: 如果用户按了 S (errorlevel 1)
+if %errorlevel% equ 1 (
+    color 0F
+    echo [OK] 自动关闭已取消。现在你可以自由查看控制台输出。
+    echo 输入任意内容或直接关闭窗口即可。
+    pause
+    exit
+)
+
+:: 如果超时或用户按了 T (errorlevel 2)，直接清屏退出
+cls
 exit
