@@ -38,7 +38,8 @@ call :CHECK_ENV
 call :CHECK_GITIGNORE
 
 :: 检测文件变更
-echo [扫描] 正在检测文件变更...
+echo [扫描] 正在检测文件变更
+
 git add . 2>nul
 
 git diff --cached --quiet
