@@ -1,105 +1,87 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-:: --- CONFIGURATION ---
+:: 配置区域
 set "REPO_PATH=C:\Users\Xioa\Desktop\Blog"
 set "BRANCH=main"
-set "TIME_STAMP=%DATE% %TIME%"
 
-title Git Auto-Sync Tool
-mode con cols=85 lines=25
+title Git 自动同步工具
 color 0B
 
-:START
+:MAIN
 cls
-echo =====================================================================
-echo              GIT BLOG CONTENT AUTO-SYNC SYSTEM
-echo =====================================================================
+echo ========================================
+echo        Git 博客内容自动同步系统
+echo ========================================
 echo.
-echo  [Directory] : %REPO_PATH%
-echo  [Timestamp] : %TIME_STAMP%
+echo  目录: %REPO_PATH%
+echo  分支: %BRANCH%
+echo  时间: %date% %time%
 echo.
 
-:: 1. Check Directory
+:: 检查目录是否存在
 if not exist "%REPO_PATH%" (
     color 0C
-    echo [ERROR] Target directory not found. 
-    echo Please check REPO_PATH in the script.
+    echo [错误] 目标目录不存在
+    echo 请检查脚本中的 REPO_PATH 配置
     pause
     exit
 )
 
 cd /d "%REPO_PATH%"
 
-:: 2. Scan Changes
-echo [*] Scanning for changes...
-git add .
+:: 检测文件变更
+echo [扫描] 正在检测文件变更...
+git add . 2>nul
 
-:: Check if there are staged changes
 git diff --cached --quiet
-if %errorlevel%==0 (
-    color 0E
-    echo ---------------------------------------------------------------------
-    echo [DONE] Status: No changes detected.
-    echo ---------------------------------------------------------------------
-    goto FINAL_COUNTDOWN
+if !errorlevel! equ 0 (
+    echo ========================================
+    echo [完成] 没有检测到任何变更
+    echo ========================================
+    goto EXIT
 )
 
-:: 3. Interactive Confirmation
-echo ---------------------------------------------------------------------
-echo [!] Local changes detected.
-echo [?] Sync to remote now?
+:: 显示变更文件
 echo.
-choice /c YN /m ">> [Y] Push Changes, [N] Cancel: "
+echo [发现] 检测到以下文件变更:
+git diff --cached --name-only
 
-if %errorlevel% equ 2 (
-    echo.
-    echo [!] Operation cancelled by user.
-    goto FINAL_COUNTDOWN
+:: 用户确认
+echo ========================================
+echo.
+choice /c YN /m "是否推送到远程仓库？[Y=是, N=否]"
+if !errorlevel! equ 2 (
+    echo [取消] 操作已取消
+    goto EXIT
 )
 
-:: 4. Execution
+:: 执行推送
 echo.
-echo [1/2] Creating commit...
-git commit -m "Auto-update: %TIME_STAMP%"
+echo [执行] 正在提交变更...
+git commit -m "自动更新: %date% %time%"
 
-echo [2/2] Pushing to remote [%BRANCH%]...
+echo [执行] 正在推送到远程仓库...
 git push origin %BRANCH%
 
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     color 0A
     echo.
-    echo =====================================================================
-    echo SUCCESS: Sync Completed!
-    echo =====================================================================
+    echo ========================================
+    echo  成功！同步完成！
+    echo ========================================
 ) else (
     color 0C
     echo.
-    echo =====================================================================
-    echo ERROR: Sync Failed. Please check network or git config.
-    echo =====================================================================
+    echo ========================================
+    echo  失败！请检查网络或Git配置
+    echo ========================================
 )
 
-
-:FINAL_COUNTDOWN
+:EXIT
 echo.
-echo ---------------------------------------------------------------------
-echo  System will exit in 3 seconds...
-echo  Press [S] to STAY and view logs.
-echo ---------------------------------------------------------------------
-
-:: Countdown 3 seconds, default to Exit (T)
-choice /c ST /t 3 /d T /n >nul
-
-:: If user presses S (Stay)
-if %errorlevel% equ 1 (
-    color 0F
-    echo [STAY] Auto-exit disabled. 
-    echo Press any key to close this window manually.
-    pause >nul
-    exit
-)
-
-:: Else exit
-cls
+echo ========================================
+echo  按任意键退出...
+pause >nul
 exit
