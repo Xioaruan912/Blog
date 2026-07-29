@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: --- CONFIGURATION ---
-set "REPO_PATH=C:\Users\Xioa\Desktop\Blog"
+set "REPO_PATH=F:\Blog"
 set "BRANCH=main"
 set "TIME_STAMP=%DATE% %TIME%"
 
