@@ -11,7 +11,7 @@
 
 ---
 
-## 一、后端节点配置（两台服务器，nginx 反代）
+## 一、Nginx代码
 
 两台服务器只做**反代转发**，把所有流量统一转发到真实源站，结构一模一样：
 
@@ -127,7 +127,19 @@ http {
 
 ---
 
-## 二、Worker 代码（`src/index.ts`）/Nignx代码
+## 二、Worker 代码
+
+首先安装
+
+```
+npm install -g wrangler
+wrangler login
+wrangler init my-lb
+cd my-lb
+npm install worker-lb
+```
+
+然后 写入到 `src/index.ts`
 
 ```ts
 import { Endpoint, LoadBalancer } from 'worker-lb';
@@ -206,24 +218,13 @@ npx wrangler deploy
 
 ## 四、踩坑记录（重点）
 
-### 坑1：`proxy` / `pw` 一直 522（连接超时）
-**原因**：域名根本没绑定到 Worker。Cloudflare 拿不到 Worker，就去直连源站的 443/80，但那些端口没开 → 522。
-**判断方法**：看响应里有没有 `x-load-balancer-endpoint` 头。有=Worker 接管了，没有=没绑定。
-**解决**：到面板把域名加为自定义域名。
+`file` / `proxy` 报 403，错误码 **1003 "Direct IP Access Not Allowed"**（最坑）
 
-### 坑2：`pw` 报 404 "Domain not configured"
-**原因**：`src/index.ts` 的 `routes` 里只写了 `file` 和 `proxy`，漏了 `pw`。
-**解决**：补上 `pw.sssssss: { port: 8443 }`。
-
-### 坑3：`file` / `proxy` 报 403，错误码 **1003 "Direct IP Access Not Allowed"**（最坑）
 **现象**：浏览器访问返回 `error code: 1003`，但直接 `curl http://1.1.1.1:5244` 却是 200，后端完全正常。
 **根因**：**Cloudflare Worker 的 `fetch()` 禁止请求裸 IP**（防 SSRF 滥用）。只要代码里写 `http://1.1.1.1:5244` 这种裸 IP，Worker 发出的请求就会被 Cloudflare 边缘直接拦下，返回 1003。只有从 Worker（Cloudflare 网络）发起才会触发，本地 curl 永远复现不了。
 **解决**：把裸 IP 换成**域名**。在 Cloudflare 建 A 记录 `node1.sssssss → 1.1.1.1`，Worker 用 `fetch("http://node1.sssssss:5244")`。官方确认：Worker 只允许 fetch 域名，不允许 fetch 裸 IP。
 
 > 注意：A 记录必须**灰云（仅 DNS）**。如果点了橙色云（代理），Worker fetch 时又会经过 Cloudflare 代理，可能再次出问题。
-
-### 坑4：Host 头问题
-转发时必须把 `Host` 强制设回原始域名（如 `file.sssssss`），不能是后端 IP，否则 nginx 反代后源站拿到错误 Host。代码里 `headers.set('Host', hostname)` 就是干这个的。
 
 ---
 
