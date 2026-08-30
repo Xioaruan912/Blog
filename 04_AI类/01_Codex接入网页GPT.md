@@ -126,3 +126,51 @@ cat ~/.devspace/auth.json
 
 然后问ChatGPT现在可以看到什么 验证是不是在目录下 即可
 
+# 设定自启动
+
+我是在wsl里安装的 所以我这里配置开机自启动
+
+```
+which devspace
+```
+
+```
+sudo vim /etc/systemd/system/devspace.service
+```
+
+```
+[Unit]
+Description=DevSpace MCP Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=修改工作目录！！！！！！
+ExecStart=/usr/local/bin/devspace serve
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable devspace.service
+sudo systemctl start devspace.service
+```
+
+检查
+
+```
+systemctl status devspace.service
+```
+
+日志
+
+```
+journalctl -u devspace.service -f
+```
+
