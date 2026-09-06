@@ -90,7 +90,6 @@ http://127.0.0.1:7676/mcp
 ```
 devspace config set publicBaseUrl https://devspace.你的域名.com
 devspace serve
-
 ```
 
 启动信息应该有如下内容

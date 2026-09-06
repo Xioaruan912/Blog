@@ -37,7 +37,7 @@
 	"setting.nowindowborder"		"1"
 	"setting.fullscreen"		"1"
 	"setting.defaultres"		"1920"
-	"setting.defaultresheight"		"1080"
+	"setting.defaultresheight"		"1440"
 	"setting.volumetric_lighting"		"0"
 	"setting.volumetric_fog"		"2"
 	"setting.mat_vsync_mode"		"0"

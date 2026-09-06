@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: --- CONFIGURATION ---
-set "REPO_PATH=F:\05_GITHUB\Blog"
+set "REPO_PATH=E:\05_GITHUB\Blog"
 set "BRANCH=main"
 set "TIME_STAMP=%DATE% %TIME%"
 
