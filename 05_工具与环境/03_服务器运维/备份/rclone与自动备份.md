@@ -11,7 +11,7 @@
 在有浏览器的机器上执行，完成 OneDrive 认证：
 
 ```sh
-rclone authorize onedrive
+.\rclone.exe authorize onedrive
 ```
 
 浏览器登录后会输出一段 JSON（整行复制）：
@@ -25,7 +25,7 @@ rclone authorize onedrive
 Linux 一键脚本：
 
 ```sh
-bash <(curl -sSL https://raw.githubusercontent.com/Xioaruan912/Xcript/main/sh/rclone.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/Xioaruan912/Xcript/main/linux/backup/rclone.sh)
 ```
 
 或官方脚本：
