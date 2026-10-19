@@ -16,6 +16,28 @@ Blog/
 └── readMe.md         本说明文件
 ```
 
+## 智能同步
+
+双击 `Auto.bat`，脚本自动识别当前分支和上游，展示中文状态；确认后提交全部改动并同步远端。没有文件改动时，也会处理尚未推送的提交和远端更新。
+
+```bat
+Auto.bat --check
+Auto.bat --yes --no-pause
+Auto.bat --help
+```
+
+- `--check`：仅检查本地状态，不联网或修改仓库；显示的远端状态来自本地缓存。
+- `--yes`：跳过确认，自动生成含新增、删除及其他修改数量的中文提交摘要。
+- `--no-pause`：结束后不等待按键，便于终端或计划任务调用。
+
+同步时优先使用当前分支的 upstream；没有 upstream 时使用 `origin`，或唯一的远端，目标为同名分支。远端不可访问时停止，不会把网络错误误判成远端分支不存在。
+
+仅落后远端时快进；双方都有新提交时先保存 `refs/auto-backup/` 备份引用，再执行保留合并结构的变基。冲突时停止推送，按提示解决后运行 `git rebase --continue`，或用 `git rebase --abort` 返回变基前状态。脚本不会强制推送。
+
+需要 Git 和 Windows 自带的 Windows PowerShell。脚本使用 UTF-8 无 BOM 编码及 CRLF 换行；请保留此格式。成功或取消返回退出码 0，失败返回 1。
+
+开发验证：`python -m unittest discover -s tests -v`，测试只操作临时本地仓库。
+
 ## 分类说明
 
 | 目录 | 内容 |

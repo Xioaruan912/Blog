@@ -1,209 +1,173 @@
 @echo off
-setlocal enabledelayedexpansion
-chcp 936 >nul
+setlocal DisableDelayedExpansion
+chcp 65001 >nul
+set "BLOG_AUTO_FILE=%~f0"
+set "BLOG_AUTO_ARGS=%*"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$s=[IO.File]::ReadAllText($env:BLOG_AUTO_FILE,[Text.Encoding]::UTF8); & ([scriptblock]::Create(($s -split '(?m)^# POWERSHELL_START\r?$',2)[1]))"
+exit /b %errorlevel%
+# POWERSHELL_START
+# Single-file launcher: keep the batch header ASCII and save as UTF-8 without BOM.
+$ErrorActionPreference = 'Stop'
+$utf8 = New-Object Text.UTF8Encoding($false)
+[Console]::OutputEncoding = $utf8
+$OutputEncoding = $utf8
+$options = @($env:BLOG_AUTO_ARGS -split '\s+' | Where-Object { $_ })
+$noPause = $options -contains '--no-pause'
+$yes = $options -contains '--yes'
+$check = $options -contains '--check'
+$exitCode = 0
 
-:: ============================================================
-::  ²©¿Í²Ö¿â ¡¤ Git ×Ô¶¯Í¬²½¹¤¾ß
-::  ÓÃ·¨£º°Ñ±¾ÎÄ¼ş·ÅÔÚ²Ö¿â¸ùÄ¿Â¼£¬Ë«»÷ÔËĞĞ¼´¿É
-:: ============================================================
-
-:: -------------------- ÅäÖÃÇø --------------------
-set "REPO_PATH=%~dp0"
-set "BRANCH=main"
-set "REMOTE=origin"
-:: ------------------------------------------------
-
-if "%REPO_PATH:~-1%"=="\" set "REPO_PATH=%REPO_PATH:~0,-1%"
-title ²©¿Í²Ö¿â ¡¤ Git ×Ô¶¯Í¬²½
-mode con cols=92 lines=34 >nul 2>nul
-
-cd /d "%REPO_PATH%" 2>nul
-if errorlevel 1 (
-    color 0C
-    echo.
-    echo  [´íÎó] ÎŞ·¨½øÈë²Ö¿âÄ¿Â¼£º
-    echo         %REPO_PATH%
-    echo.
-    pause
-    exit /b 1
-)
-
-:MENU
-cls
-color 0B
-call :HEADER
-
-:: ---------- »·¾³¼ì²é ----------
-where git >nul 2>nul
-if errorlevel 1 (
-    color 0C
-    echo  [´íÎó] Î´¼ì²âµ½ Git£¬ÇëÏÈ°²×°²¢¼ÓÈëÏµÍ³ PATH¡£
-    echo         ÏÂÔØµØÖ·£ºhttps://git-scm.com/download/win
-    goto :END
-)
-
-git rev-parse --is-inside-work-tree >nul 2>nul
-if errorlevel 1 (
-    color 0E
-    echo  [¾¯¸æ] µ±Ç°Ä¿Â¼²»ÊÇÓĞĞ§µÄ Git ²Ö¿â£º
-    echo         %REPO_PATH%
-    echo.
-    echo  ³£¼ûÔ­Òò£º.git Ä¿Â¼È±Ê§»òËğ»µ£¬ÀıÈçÈ±ÉÙ objects ×ÓÄ¿Â¼¡£
-    echo.
-    choice /c YN /m " ÊÇ·ñÔÚ´Ë³õÊ¼»¯²Ö¿â²¢¹ØÁªÔ¶³Ì¡¾Y/N¡¿" /t 30 /d N
-    if !errorlevel! equ 2 goto :END
-    call :INIT_REPO
-    goto :MENU
-)
-
-:: ---------- ²Ö¿âĞÅÏ¢ ----------
-for /f "delims=" %%b in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set "CUR_BRANCH=%%b"
-set "CUR_REMOTE="
-for /f "delims=" %%r in ('git remote get-url %REMOTE% 2^>nul') do set "CUR_REMOTE=%%r"
-
-echo  [²Ö¿â] %REPO_PATH%
-echo  [·ÖÖ§] !CUR_BRANCH!           [Ô¶³Ì] %REMOTE% / %BRANCH%
-if defined CUR_REMOTE (
-    echo  [µØÖ·] !CUR_REMOTE!
-) else (
-    echo  [µØÖ·] Î´ÅäÖÃÔ¶³Ì %REMOTE%
-)
-if /i not "!CUR_BRANCH!"=="%BRANCH%" (
-    echo.
-    echo  [ÌáÊ¾] µ±Ç°·ÖÖ§Îª !CUR_BRANCH!£¬ÓëÅäÖÃµÄÍ¬²½·ÖÖ§ %BRANCH% ²»Ò»ÖÂ¡£
-)
-echo.
-
-:: ---------- É¨Ãè¸Ä¶¯ ----------
-echo  [*] ÕıÔÚÉ¨Ãè±¾µØ¸Ä¶¯...
-set "CHANGES=0"
-for /f %%c in ('git status --porcelain ^| find /c /v ""') do set "CHANGES=%%c"
-
-if "!CHANGES!"=="0" (
-    color 0E
-    echo.
-    echo  ============================================================
-    echo   [Íê³É] Ã»ÓĞ¼ì²âµ½ÈÎºÎ¸Ä¶¯£¬ÎŞĞèÍ¬²½¡£
-    echo  ============================================================
-    goto :END
-)
-
-echo.
-echo  ------------------------------------------------------------
-echo   [·¢ÏÖ] ¹² !CHANGES! ´¦¸Ä¶¯£º
-echo  ------------------------------------------------------------
-git status --short
-echo  ------------------------------------------------------------
-echo.
-
-:: ---------- Ìá½»ĞÅÏ¢ ----------
-for /f "usebackq delims=" %%t in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd HH:mm'"`) do set "DEFAULT_MSG=Auto update: %%t"
-echo   Ä¬ÈÏÌá½»ĞÅÏ¢£º!DEFAULT_MSG!
-set "MSG="
-set /p "MSG= ÇëÊäÈëÌá½»ĞÅÏ¢¡¾Ö±½Ó»Ø³µÊ¹ÓÃÄ¬ÈÏ¡¿: "
-if not defined MSG set "MSG=!DEFAULT_MSG!"
-
-echo.
-choice /c YN /m " È·ÈÏÌá½»²¢ÍÆËÍµ½ %REMOTE%/%BRANCH% Âğ" /t 60 /d N
-if !errorlevel! equ 2 (
-    echo.
-    echo  [È¡Ïû] ÒÑÈ¡Ïû±¾´ÎÍ¬²½£¬Î´×öÈÎºÎ¸Ä¶¯¡£
-    goto :END
-)
-
-:: ---------- Ôİ´æÓëÌá½» ----------
-echo.
-echo  [1/3] Ôİ´æ²¢Ìá½»¸Ä¶¯...
-git add -A
-> "%TEMP%\blog_commit_msg.txt" echo !MSG!
-git commit -F "%TEMP%\blog_commit_msg.txt" >nul
-set "COMMIT_RC=!errorlevel!"
-del "%TEMP%\blog_commit_msg.txt" >nul 2>nul
-if not "!COMMIT_RC!"=="0" (
-    color 0C
-    echo.
-    echo  [Ê§°Ü] Ìá½»Ê§°Ü£¬Çë²é¿´ÉÏ·½ Git Êä³ö¡£
-    goto :END
-)
-
-:: ---------- À­È¡Ô¶³Ì¸üĞÂ ----------
-set "HAS_REMOTE=0"
-if defined CUR_REMOTE for /f "delims=" %%x in ('git ls-remote --heads %REMOTE% %BRANCH% 2^>nul') do set "HAS_REMOTE=1"
-
-if "!HAS_REMOTE!"=="1" (
-    echo  [2/3] À­È¡Ô¶³Ì¸üĞÂ²¢±ä»ù...
-    git pull --rebase %REMOTE% %BRANCH%
-    if errorlevel 1 (
-        color 0E
-        echo.
-        echo  [¾¯¸æ] À­È¡»ò±ä»ùÊ§°Ü£¬¿ÉÄÜ´æÔÚ³åÍ»¡£
-        echo         ÇëÊÖ¶¯´¦Àí¡¾git status¡¿ºóÖØĞÂÔËĞĞ±¾½Å±¾¡£
-        goto :END
-    )
-) else (
-    echo  [2/3] Ô¶³ÌÔİÎŞ %BRANCH% ·ÖÖ§£¬Ìø¹ıÀ­È¡¡£
-)
-
-:: ---------- ÍÆËÍ ----------
-echo  [3/3] ÍÆËÍµ½ %REMOTE%/%BRANCH% ...
-git push -u %REMOTE% HEAD:%BRANCH%
-if errorlevel 1 (
-    color 0C
-    echo.
-    echo  ============================================================
-    echo   [Ê§°Ü] ÍÆËÍÊ§°Ü£¬Çë¼ì²éÍøÂç»òÔ¶³Ì²Ö¿âÅäÖÃ¡£
-    echo  ============================================================
-    goto :END
-)
-
-color 0A
-echo.
-echo  ============================================================
-echo   [³É¹¦] ÒÑÍ¬²½µ½ %REMOTE%/%BRANCH%
-echo   [ĞÅÏ¢] !MSG!
-echo  ============================================================
-goto :END
-
-
-:: ============================================================
-::  ×Ó¹ı³Ì
-:: ============================================================
-:HEADER
-echo ============================================================
-echo              ²©¿Í²Ö¿â ¡¤ Git ×Ô¶¯Í¬²½¹¤¾ß
-echo ============================================================
-echo.
-goto :eof
-
-:INIT_REPO
-echo.
-set "INIT_URL="
-set /p "INIT_URL= ÇëÊäÈëÔ¶³Ì²Ö¿âµØÖ·¡¾Èç https://github.com/ÓÃ»§/²Ö¿â.git¡¿: "
-git init >nul
-git branch -M %BRANCH% >nul 2>nul
-if defined INIT_URL (
-    git remote add %REMOTE% "!INIT_URL!" >nul 2>nul
-    git remote set-url %REMOTE% "!INIT_URL!" >nul 2>nul
-    echo  [Íê³É] ÒÑ³õÊ¼»¯±¾µØ²Ö¿â²¢¹ØÁªÔ¶³Ì£º
-    echo         !INIT_URL!
-) else (
-    echo  [Íê³É] ÒÑ³õÊ¼»¯±¾µØ²Ö¿â£¬Î´ÅäÖÃÔ¶³Ì¡£
-)
-echo.
-pause
-goto :eof
-
-:END
-echo.
-echo  ------------------------------------------------------------
-echo   3 Ãëºó×Ô¶¯¹Ø±Õ£¬°´ S ¼üÍ£Áô²é¿´Êä³ö¡£
-echo  ------------------------------------------------------------
-choice /c ST /t 3 /d T /n >nul
-if !errorlevel! equ 1 (
-    color 0F
-    echo  [Í£Áô] Çë°´ÈÎÒâ¼ü¹Ø±Õ´°¿Ú¡£
-    pause >nul
-    exit /b 0
-)
-cls
-exit /b 0
+function Say([string]$Text) { Write-Host $Text }
+function Git([string[]]$Arguments, [switch]$AllowFailure) {
+    # Native stderr is an ErrorRecord in Windows PowerShell, not status data.
+    $saved = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $result = @(& git.exe -c core.quotepath=false @Arguments 2>&1)
+        $code = $LASTEXITCODE
+    } finally { $ErrorActionPreference = $saved }
+    $diagnostic = ($result | Where-Object { $_ -is [Management.Automation.ErrorRecord] } | ForEach-Object { $_.ToString() }) -join "`n"
+    $result = @($result | Where-Object { $_ -isnot [Management.Automation.ErrorRecord] })
+    $script:gitCode = $code
+    $output = $result -join "`n"
+    if ($code -ne 0 -and -not $AllowFailure) {
+        throw ("Git æ“ä½œå¤±è´¥ï¼šgit {0}`n{1}`n{2}" -f ($Arguments -join ' '), $output, $diagnostic)
+    }
+    if ($code -eq 0 -and $diagnostic) { Write-Host $diagnostic.TrimEnd() }
+    return $output
+}
+function RunGit([string[]]$Arguments) {
+    $output = Git $Arguments
+    if ($output) { Say $output }
+}
+function Sync-Repository {
+    if ($options -contains '--help') {
+        Say 'ç”¨æ³•ï¼šAuto.bat [--check] [--yes] [--no-pause]'
+        Say '  é»˜è®¤ï¼šæ£€æŸ¥çŠ¶æ€ï¼Œç¡®è®¤åè‡ªåŠ¨æäº¤ã€æ•´åˆè¿œç«¯å¹¶æ¨é€ã€‚'
+        Say '  --checkï¼šä»…æœ¬åœ°æ£€æŸ¥ï¼›ä¸è”ç½‘ã€ä¸æš‚å­˜ã€ä¸æäº¤ã€ä¸æ¨é€ã€‚'
+        Say '  --yesï¼šä½¿ç”¨è‡ªåŠ¨æäº¤æ‘˜è¦ï¼Œå…äº¤äº’ç¡®è®¤ã€‚'
+        Say '  --no-pauseï¼šç»“æŸåä¸ç­‰å¾…ï¼Œé€‚åˆç»ˆç«¯å’Œè‡ªåŠ¨åŒ–è°ƒç”¨ã€‚'
+        return
+    }
+    foreach ($option in $options) {
+        if ($option -notin @('--check','--yes','--no-pause')) { throw "æœªçŸ¥å‚æ•°ï¼š$optionï¼›ä½¿ç”¨ --help æŸ¥çœ‹å¸®åŠ©ã€‚" }
+    }
+    if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) { throw 'æœªæ‰¾åˆ° Gitï¼Œè¯·å…ˆå®‰è£… Git å¹¶åŠ å…¥ PATHã€‚' }
+    Set-Location -LiteralPath (Split-Path -LiteralPath $env:BLOG_AUTO_FILE)
+    Say '========== åšå®¢ä»“åº“ Â· æ™ºèƒ½ Git åŒæ­¥ =========='
+    $inside = Git @('rev-parse','--is-inside-work-tree')
+    if ($inside -ne 'true') { throw 'è„šæœ¬å¿…é¡»æ”¾åœ¨ Git å·¥ä½œåŒºä¸­ã€‚' }
+    $root = Git @('rev-parse','--show-toplevel')
+    Set-Location -LiteralPath $root
+    $branch = Git @('symbolic-ref','--quiet','--short','HEAD') -AllowFailure
+    if ($gitCode -ne 0) { throw 'å½“å‰ä¸ºæ¸¸ç¦» HEADï¼Œè¯·å…ˆåˆ‡æ¢åˆ°éœ€è¦åŒæ­¥çš„åˆ†æ”¯ã€‚' }
+    foreach ($state in @('MERGE_HEAD','rebase-merge','rebase-apply','CHERRY_PICK_HEAD','REVERT_HEAD','sequencer','index.lock')) {
+        $path = Git @('rev-parse','--git-path',$state)
+        if (Test-Path -LiteralPath $path) { throw "å‘ç°æœªå®Œæˆæ“ä½œæˆ–é”æ–‡ä»¶ï¼š$stateã€‚è¯·å…ˆè¿è¡Œ git status å¤„ç†åé‡è¯•ã€‚" }
+    }
+    $conflicts = Git @('diff','--name-only','--diff-filter=U')
+    if ($conflicts) { throw "å­˜åœ¨æœªè§£å†³å†²çªï¼š`n$conflicts" }
+    $remote = Git @('config','--get',"branch.$branch.remote") -AllowFailure
+    $merge = Git @('config','--get',"branch.$branch.merge") -AllowFailure
+    if (-not $remote) {
+        $remotes = @((Git @('remote')) -split "`n" | Where-Object { $_ })
+        if ($remotes -contains 'origin') { $remote = 'origin' }
+        elseif ($remotes.Count -eq 1) { $remote = $remotes[0] }
+        else { throw 'æ— æ³•å”¯ä¸€ç¡®å®šè¿œç«¯ï¼Œè¯·å…ˆé…ç½®å½“å‰åˆ†æ”¯çš„ upstream æˆ– originã€‚' }
+        $merge = "refs/heads/$branch"
+    }
+    if ($remote -eq '.' -or -not $merge.StartsWith('refs/heads/')) { throw 'å½“å‰ä¸Šæ¸¸ä¸æ˜¯è¿œç¨‹åˆ†æ”¯ï¼Œè¯·å…ˆä¿®æ­£ upstream é…ç½®ã€‚' }
+    $target = $merge.Substring(11)
+    $null = Git @('remote','get-url',$remote)
+    Say "[ä»“åº“] $root"
+    Say "[åˆ†æ”¯] $branch  â†’  $remote/$target"
+    $status = Git @('status','--porcelain=v1','--untracked-files=all')
+    $entries = @($status -split "`n" | Where-Object { $_ })
+    Say "[æ”¹åŠ¨] $($entries.Count) é¡¹æ–‡ä»¶çŠ¶æ€"
+    if ($status) { Say $status }
+    if ($check) {
+        Say (Git @('status','--short','--branch'))
+        Say '[åªæ£€æŸ¥] ä»¥ä¸Šè¿œç«¯çŠ¶æ€æ¥è‡ªæœ¬åœ°ç¼“å­˜ï¼Œæœªè”ç½‘æ›´æ–°ã€‚'
+        return
+    }
+    if ($status) {
+        $name = Git @('var','GIT_AUTHOR_IDENT') -AllowFailure
+        if ($gitCode -ne 0) { throw 'æäº¤èº«ä»½ä¸å¯ç”¨ï¼Œè¯·é…ç½® git config user.name å’Œ git config user.emailã€‚' }
+    }
+    Say '[æ£€æŸ¥] æ­£åœ¨è¯»å–è¿œç«¯åˆ†æ”¯ï¼›å¤±è´¥æ—¶ä¿ç•™æœ¬åœ°æ”¹åŠ¨ã€‚'
+    $head = Git @('ls-remote','--heads',$remote,$merge)
+    $remoteExists = -not [string]::IsNullOrWhiteSpace($head)
+    if ($remoteExists) {
+        RunGit @('fetch','--no-tags',$remote,$merge)
+        $remoteHead = Git @('rev-parse','FETCH_HEAD')
+    }
+    $null = Git @('rev-parse','--verify','HEAD') -AllowFailure
+    $hasHead = $gitCode -eq 0
+    if (-not $hasHead -and $remoteExists) { throw 'æœ¬åœ°å°šæ— æäº¤ï¼Œä½†è¿œç«¯å·²æœ‰å†å²ã€‚è¯·å…ˆå…‹éš†è¿œç«¯ä»“åº“å†å¤åˆ¶ç¬”è®°ï¼Œé¿å…åˆ›å»ºæ— å…³å†å²ã€‚' }
+    if ($hasHead -and $remoteExists) {
+        $null = Git @('merge-base','HEAD',$remoteHead) -AllowFailure
+        if ($gitCode -ne 0) { throw 'æœ¬åœ°ä¸è¿œç«¯æ²¡æœ‰å…±åŒå†å²ï¼Œåœæ­¢è‡ªåŠ¨åŒæ­¥ã€‚' }
+        $counts = (Git @('rev-list','--left-right','--count',"HEAD...$remoteHead")) -split '\s+'
+        Say "[åŒæ­¥] æœ¬åœ°é¢†å…ˆ $($counts[0]) ä¸ªæäº¤ï¼Œè½å $($counts[1]) ä¸ªæäº¤ã€‚"
+        if (-not $status -and $counts[0] -eq '0' -and $counts[1] -eq '0') {
+            Say '[å®Œæˆ] æœ¬åœ°ä¸è¿œç«¯å·²ç»ä¸€è‡´ï¼Œæ— éœ€æ“ä½œã€‚'
+            return
+        }
+    } else { Say '[åŒæ­¥] è¿œç«¯ç›®æ ‡åˆ†æ”¯å°šä¸å­˜åœ¨ï¼Œå°†åœ¨æ¨é€æ—¶åˆ›å»ºã€‚' }
+    if (-not $yes) {
+        $answer = Read-Host 'ç¡®è®¤è‡ªåŠ¨æäº¤å…¨éƒ¨æ”¹åŠ¨ã€æ•´åˆè¿œç«¯å¹¶æ¨é€ï¼Ÿ[y/N]'
+        if ($answer -notin @('y','Y')) { Say '[å–æ¶ˆ] æœªæš‚å­˜ã€æäº¤æˆ–æ¨é€ã€‚'; return }
+    }
+    if ($status) {
+        $added = @($entries | Where-Object { $_ -match '^(\?\?|A.|.A)' }).Count
+        $deleted = @($entries | Where-Object { $_ -match '^(D.|.D)' }).Count
+        $other = $entries.Count - $added - $deleted
+        $message = "æ›´æ–°ç¬”è®°ï¼šæ–°å¢ $addedï¼Œåˆ é™¤ $deletedï¼Œå…¶ä»–ä¿®æ”¹ $otherï¼ˆ$(Get-Date -Format 'yyyy-MM-dd HH:mm')ï¼‰"
+        if (-not $yes) {
+            Say "[é»˜è®¤æ‘˜è¦] $message"
+            $custom = Read-Host 'æäº¤è¯´æ˜ï¼ˆå›è½¦ä½¿ç”¨é»˜è®¤ï¼‰'
+            if (-not [string]::IsNullOrWhiteSpace($custom)) { $message = $custom }
+        }
+        RunGit @('add','--all')
+        $null = Git @('diff','--cached','--quiet') -AllowFailure
+        if ($gitCode -eq 1) {
+            $messageFile = [IO.Path]::GetTempFileName()
+            try {
+                [IO.File]::WriteAllText($messageFile, $message, $utf8)
+                RunGit @('commit','-F',$messageFile)
+            } finally { Remove-Item -LiteralPath $messageFile -ErrorAction SilentlyContinue }
+        } elseif ($gitCode -ne 0) { throw 'æ— æ³•æ£€æŸ¥æš‚å­˜åŒºï¼Œåœæ­¢æ“ä½œã€‚' }
+    }
+    if (Git @('status','--porcelain')) { throw 'æäº¤åå·¥ä½œåŒºä»æœ‰æ”¹åŠ¨ï¼ˆå¯èƒ½ä¸ºå­æ¨¡å—æˆ–é’©å­ç”Ÿæˆæ–‡ä»¶ï¼‰ï¼Œè¯·å¤„ç†åé‡è¯•ã€‚' }
+    if ($remoteExists) {
+        $counts = (Git @('rev-list','--left-right','--count',"HEAD...$remoteHead")) -split '\s+'
+        if ([int]$counts[1] -gt 0) {
+            if ([int]$counts[0] -eq 0) {
+                Say '[æ•´åˆ] ä»…è½åè¿œç«¯ï¼Œæ‰§è¡Œå¿«è¿›æ›´æ–°ã€‚'
+                RunGit @('merge','--ff-only',$remoteHead)
+            } else {
+                $backup = 'refs/auto-backup/' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
+                RunGit @('update-ref',$backup,'HEAD')
+                Say "[ä¿æŠ¤] å˜åŸºå‰å·²ä¿å­˜æœ¬åœ°æäº¤ï¼š$backup"
+                Say '[æ•´åˆ] åŒæ–¹éƒ½æœ‰æ–°æäº¤ï¼Œä¿ç•™åˆå¹¶ç»“æ„æ‰§è¡Œå˜åŸºã€‚'
+                try { RunGit @('rebase','--rebase-merges',$remoteHead) }
+                catch { throw "å˜åŸºæœªå®Œæˆï¼Œå·²åœæ­¢æ¨é€ã€‚è¿è¡Œ git status æŸ¥çœ‹ï¼›è§£å†³å git rebase --continueï¼Œæˆ– git rebase --abort è¿”å›å˜åŸºå‰çŠ¶æ€ã€‚`n$_" }
+            }
+        }
+    }
+    Say "[æ¨é€] $remote/$target"
+    RunGit @('push','--set-upstream',$remote,"HEAD:$merge")
+    Say '[å®Œæˆ] åŒæ­¥æˆåŠŸã€‚'
+}
+try { Sync-Repository }
+catch {
+    $exitCode = 1
+    Write-Host "[å¤±è´¥] $_" -ForegroundColor Red
+    Say 'å·²åœæ­¢åç»­æ“ä½œã€‚å¯æ ¹æ®ä¸Šæ–¹é”™è¯¯å¤„ç†åé‡æ–°è¿è¡Œï¼›æœ¬åœ°å·²æœ‰æäº¤ä¼šåœ¨ä¸‹æ¬¡ç»§ç»­åŒæ­¥ã€‚'
+}
+finally {
+    if (-not $noPause -and -not [Console]::IsInputRedirected) {
+        $null = Read-Host 'æŒ‰å›è½¦å…³é—­çª—å£'
+    }
+}
+exit $exitCode
