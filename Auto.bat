@@ -222,7 +222,14 @@ catch {
 }
 finally {
     if (-not $noPause -and -not [Console]::IsInputRedirected) {
-        $null = Read-Host '按回车关闭窗口'
+        Write-Host '按回车立即关闭窗口，2 秒后自动关闭。'
+        $closeTimer = [Diagnostics.Stopwatch]::StartNew()
+        while ($closeTimer.Elapsed.TotalSeconds -lt 2) {
+            if ([Console]::KeyAvailable) {
+                if ([Console]::ReadKey($true).Key -eq [ConsoleKey]::Enter) { break }
+            }
+            Start-Sleep -Milliseconds 50
+        }
     }
 }
 exit $exitCode
