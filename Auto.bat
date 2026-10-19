@@ -1,9 +1,9 @@
 @echo off
 setlocal DisableDelayedExpansion
 chcp 65001 >nul
-set "BLOG_AUTO_FILE=%~f0"
-set "BLOG_AUTO_ARGS=%*"
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$s=[IO.File]::ReadAllText($env:BLOG_AUTO_FILE,[Text.Encoding]::UTF8); & ([scriptblock]::Create(($s -split '(?m)^# POWERSHELL_START\r?$',2)[1]))"
+set "GIT_AUTO_FILE=%~f0"
+set "GIT_AUTO_ARGS=%*"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$s=[IO.File]::ReadAllText($env:GIT_AUTO_FILE,[Text.Encoding]::UTF8); & ([scriptblock]::Create(($s -split '(?m)^# POWERSHELL_START\r?$',2)[1]))"
 exit /b %errorlevel%
 # POWERSHELL_START
 # Single-file launcher: keep the batch header ASCII and save as UTF-8 without BOM.
@@ -11,7 +11,7 @@ $ErrorActionPreference = 'Stop'
 $utf8 = New-Object Text.UTF8Encoding($false)
 [Console]::OutputEncoding = $utf8
 $OutputEncoding = $utf8
-$options = @($env:BLOG_AUTO_ARGS -split '\s+' | Where-Object { $_ })
+$options = @($env:GIT_AUTO_ARGS -split '\s+' | Where-Object { $_ })
 $noPause = $options -contains '--no-pause'
 $yes = $options -contains '--yes'
 $check = $options -contains '--check'
@@ -40,10 +40,53 @@ function RunGit([string[]]$Arguments) {
     $output = Git $Arguments
     if ($output) { Say $output }
 }
+function Read-TimedInput([string]$Prompt, [string]$Default = '') {
+    Write-Host "$Prompt（5 秒未输入使用默认；开始输入后按回车确认）: " -NoNewline
+    $timer = [Diagnostics.Stopwatch]::StartNew()
+    $buffer = New-Object Text.StringBuilder
+    if ([Console]::IsInputRedirected) {
+        $line = [Console]::In.ReadLineAsync()
+        while ($timer.Elapsed.TotalSeconds -lt 5) {
+            if ($line.IsCompleted) {
+                $value = $line.GetAwaiter().GetResult()
+                if ($null -ne $value) {
+                    Write-Host $value
+                    if ([string]::IsNullOrWhiteSpace($value)) { return $Default }
+                    return $value
+                }
+            }
+            Start-Sleep -Milliseconds 50
+        }
+    } else {
+        $started = $false
+        while ($started -or $timer.Elapsed.TotalSeconds -lt 5) {
+            if (-not [Console]::KeyAvailable) { Start-Sleep -Milliseconds 50; continue }
+            $key = [Console]::ReadKey($true)
+            if ($key.Key -eq [ConsoleKey]::Enter) {
+                Write-Host ''
+                if ([string]::IsNullOrWhiteSpace($buffer.ToString())) { return $Default }
+                return $buffer.ToString()
+            }
+            if ($key.Key -eq [ConsoleKey]::Backspace) {
+                if ($buffer.Length -gt 0) {
+                    $null = $buffer.Remove($buffer.Length - 1, 1)
+                    Write-Host "`b `b" -NoNewline
+                }
+            } elseif (-not [char]::IsControl($key.KeyChar)) {
+                $started = $true
+                $null = $buffer.Append($key.KeyChar)
+                Write-Host $key.KeyChar -NoNewline
+            }
+        }
+    }
+    Write-Host '[超时，使用默认值]'
+    return $Default
+}
 function Sync-Repository {
     if ($options -contains '--help') {
+        Say '可复制到任意仓库根目录或子目录，自动读取该仓库的 Git 配置。'
         Say '用法：Auto.bat [--check] [--yes] [--no-pause]'
-        Say '  默认：检查状态，确认后自动提交、整合远端并推送。'
+        Say '  默认：确认与提交说明各等待 5 秒，无输入自动确认并使用默认摘要。'
         Say '  --check：仅本地检查；不联网、不暂存、不提交、不推送。'
         Say '  --yes：使用自动提交摘要，免交互确认。'
         Say '  --no-pause：结束后不等待，适合终端和自动化调用。'
@@ -53,11 +96,20 @@ function Sync-Repository {
         if ($option -notin @('--check','--yes','--no-pause')) { throw "未知参数：$option；使用 --help 查看帮助。" }
     }
     if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) { throw '未找到 Git，请先安装 Git 并加入 PATH。' }
-    Set-Location -LiteralPath (Split-Path -LiteralPath $env:BLOG_AUTO_FILE)
-    Say '========== 博客仓库 · 智能 Git 同步 =========='
-    $inside = Git @('rev-parse','--is-inside-work-tree')
-    if ($inside -ne 'true') { throw '脚本必须放在 Git 工作区中。' }
+    # Bind discovery to this script, not the launching shell's repository overrides.
+    foreach ($variable in @('GIT_DIR','GIT_WORK_TREE','GIT_COMMON_DIR','GIT_INDEX_FILE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES','GIT_NAMESPACE','GIT_PREFIX','GIT_CEILING_DIRECTORIES')) {
+        [Environment]::SetEnvironmentVariable($variable, $null, 'Process')
+    }
+    Set-Location -LiteralPath (Split-Path -LiteralPath $env:GIT_AUTO_FILE)
+    Say '========== 通用仓库 · 智能 Git 同步 =========='
+    # Git resolves both .git directories and .git files (worktrees/submodules).
+    $inside = Git @('rev-parse','--is-inside-work-tree') -AllowFailure
+    if ($gitCode -ne 0 -or $inside -ne 'true') {
+        throw '未找到有效的 Git 工作区。请把 Auto.bat 放入目标仓库根目录（与 .git 同级）或其子目录；裸仓库不支持。'
+    }
     $root = Git @('rev-parse','--show-toplevel')
+    $gitDirectory = Git @('rev-parse','--absolute-git-dir')
+    $repoName = Split-Path -Leaf $root
     Set-Location -LiteralPath $root
     $branch = Git @('symbolic-ref','--quiet','--short','HEAD') -AllowFailure
     if ($gitCode -ne 0) { throw '当前为游离 HEAD，请先切换到需要同步的分支。' }
@@ -67,20 +119,10 @@ function Sync-Repository {
     }
     $conflicts = Git @('diff','--name-only','--diff-filter=U')
     if ($conflicts) { throw "存在未解决冲突：`n$conflicts" }
-    $remote = Git @('config','--get',"branch.$branch.remote") -AllowFailure
-    $merge = Git @('config','--get',"branch.$branch.merge") -AllowFailure
-    if (-not $remote) {
-        $remotes = @((Git @('remote')) -split "`n" | Where-Object { $_ })
-        if ($remotes -contains 'origin') { $remote = 'origin' }
-        elseif ($remotes.Count -eq 1) { $remote = $remotes[0] }
-        else { throw '无法唯一确定远端，请先配置当前分支的 upstream 或 origin。' }
-        $merge = "refs/heads/$branch"
-    }
-    if ($remote -eq '.' -or -not $merge.StartsWith('refs/heads/')) { throw '当前上游不是远程分支，请先修正 upstream 配置。' }
-    $target = $merge.Substring(11)
-    $null = Git @('remote','get-url',$remote)
+    Say "[项目] $repoName"
     Say "[仓库] $root"
-    Say "[分支] $branch  →  $remote/$target"
+    Say "[Git 目录] $gitDirectory"
+    Say "[当前分支] $branch"
     $status = Git @('status','--porcelain=v1','--untracked-files=all')
     $entries = @($status -split "`n" | Where-Object { $_ })
     Say "[改动] $($entries.Count) 项文件状态"
@@ -90,6 +132,19 @@ function Sync-Repository {
         Say '[只检查] 以上远端状态来自本地缓存，未联网更新。'
         return
     }
+    $remote = Git @('config','--get',"branch.$branch.remote") -AllowFailure
+    $merge = Git @('config','--get',"branch.$branch.merge") -AllowFailure
+    if (-not $remote) {
+        $remotes = @((Git @('remote')) -split "`n" | Where-Object { $_ })
+        if ($remotes -contains 'origin') { $remote = 'origin' }
+        elseif ($remotes.Count -eq 1) { $remote = $remotes[0] }
+        else { throw '无法唯一确定远端，请先配置当前分支的 upstream 或 origin。' }
+        $merge = "refs/heads/$branch"
+    }
+    if ($remote -eq '.' -or -not $merge -or -not $merge.StartsWith('refs/heads/')) { throw '当前上游不是远程分支，请先修正 upstream 配置。' }
+    $target = $merge.Substring(11)
+    $null = Git @('remote','get-url',$remote)
+    Say "[分支] $branch  →  $remote/$target"
     if ($status) {
         $name = Git @('var','GIT_AUTHOR_IDENT') -AllowFailure
         if ($gitCode -ne 0) { throw '提交身份不可用，请配置 git config user.name 和 git config user.email。' }
@@ -103,7 +158,7 @@ function Sync-Repository {
     }
     $null = Git @('rev-parse','--verify','HEAD') -AllowFailure
     $hasHead = $gitCode -eq 0
-    if (-not $hasHead -and $remoteExists) { throw '本地尚无提交，但远端已有历史。请先克隆远端仓库再复制笔记，避免创建无关历史。' }
+    if (-not $hasHead -and $remoteExists) { throw '本地尚无提交，但远端已有历史。请先克隆远端仓库再复制项目文件，避免创建无关历史。' }
     if ($hasHead -and $remoteExists) {
         $null = Git @('merge-base','HEAD',$remoteHead) -AllowFailure
         if ($gitCode -ne 0) { throw '本地与远端没有共同历史，停止自动同步。' }
@@ -115,17 +170,17 @@ function Sync-Repository {
         }
     } else { Say '[同步] 远端目标分支尚不存在，将在推送时创建。' }
     if (-not $yes) {
-        $answer = Read-Host '确认自动提交全部改动、整合远端并推送？[y/N]'
+        $answer = Read-TimedInput '确认自动提交全部改动、整合远端并推送？[Y/n]' 'y'
         if ($answer -notin @('y','Y')) { Say '[取消] 未暂存、提交或推送。'; return }
     }
     if ($status) {
         $added = @($entries | Where-Object { $_ -match '^(\?\?|A.|.A)' }).Count
         $deleted = @($entries | Where-Object { $_ -match '^(D.|.D)' }).Count
         $other = $entries.Count - $added - $deleted
-        $message = "更新笔记：新增 $added，删除 $deleted，其他修改 $other（$(Get-Date -Format 'yyyy-MM-dd HH:mm')）"
+        $message = "更新 ${repoName}：新增 $added，删除 $deleted，其他修改 $other（$(Get-Date -Format 'yyyy-MM-dd HH:mm')）"
         if (-not $yes) {
             Say "[默认摘要] $message"
-            $custom = Read-Host '提交说明（回车使用默认）'
+            $custom = Read-TimedInput '提交说明（回车使用默认摘要）'
             if (-not [string]::IsNullOrWhiteSpace($custom)) { $message = $custom }
         }
         RunGit @('add','--all')
