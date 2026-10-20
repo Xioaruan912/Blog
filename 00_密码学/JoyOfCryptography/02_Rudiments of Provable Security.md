@@ -138,3 +138,121 @@ REROLL():
 ![image-20261020151042482](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020151042515.png)
 
 请注意 敌手调用程序 是无法知道子程序内部的变量，所以我们可以大胆的把KEY作为参数传入，因为敌手只可以得到子程序的返回内容
+
+# 2.3. How to distinguish two libraries
+
+那么这里我们如果需要证明一个方案是不安全 我们需要如何说明？
+
+其实就是说明 这个方案在两个原本可以互相交换的库中，基于敌手的操作，展现出来是不同的成功概率，这样证明出其实这两个库是不可互相交换的，从而证明敌手攻击成功
+
+![image-20261020160507058](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020160507123.png)
+
+这里是具体的步骤
+
+1. 确定哪两个库被包含在里面
+2. 编写调用程序，这个程序的目的是让这两个库展现出不同的成功概率
+3. 计算这两个概率的差值，如果不同，攻击就成功
+
+我们使用具体例子说明——这里的例子使用的OTP的相同密钥加密
+
+我们说明这个情况下OTP不安全只要说明下面两个库不互相交换即可
+
+![image-20261020160631056](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020160631088.png)
+
+我们存在三个攻击方法 实现证明
+
+1. 使用相同密钥 加密全0 字符串 可以得到输出概率不同
+2. 使用相同明文 和相同密钥 加密，可以得到输出概率不同
+3. 使用不同的消息 和相同密钥，基于XOR的运算性质，可以得到不同的输出概率
+
+最后一个证明为：
+
+![image-20261020160808592](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020160808620.png)
+
+## XOR取消策略
+
+这里也可以延申出 XOR攻击
+
+将攻击者能够看到的数值用代数形式表示为异或表达式
+
+如果两个表达式有公共项，那么对它们进行异或运算会使公共项抵消，而结果通常可用于攻击
+
+那么基于OTP的攻击可以发现 我们主要就是判别 通过编写A的程序，能不能让 两个库展示不同的概率 如果不同 那么就说明不安全
+
+# 2.4.How to prove that two libraries are interchangeable
+
+上面说明了 安全和不可互换性挂钩，那我们如何可以证明 一个安全呢？也就是如何说明两个库是可互换的呢？
+
+我们使用的 是混合证明技术
+
+## 混合证明技术 Hybrid Proof Technique
+
+![image-20261020192926411](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020192926543.png)
+
+其实可以视作链式处理，每对都具有可互换，这样我们最终就可以得到 start和end的可互换
+
+### 链式规则
+
+混合证明技术基于链式规则 也就是两个两个之间的可互换
+
+![image-20261020193039151](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020193039192.png)
+
+如果 两个库可互换，如果存在L 执行L1库 的结果和L执行L2库一样 是可互换的
+
+我们可以提供一个敌手证明，这里可以看作就是 库的一个执行运算
+
+![image-20261020193150317](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020193150353.png)
+
+下面我们将会给出一个具体的例子 用于理解混合证明技术
+
+## 例子证明
+
+我们需要证明下面两个库是可互换的
+
+![image-20261020195623100](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195623214.png)
+
+现在开始证明
+
+第一步 我们引入一个 X' 用于解放X，这一步是为了让X’ 可以脱离出来
+
+![image-20261020195703116](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195703156.png)
+
+然后我们同样替换 return 中的X 因为我们可以发现 X’=X
+
+![image-20261020195741684](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195741719.png)
+
+然后我们观察上面两个 是不是就是满足 OTP的算法 我们直接提取出去 作为 OTP_real，然后用OTP.ENC代替之前Y的计算过程
+
+![image-20261020195829075](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195829127.png)
+
+按照我们以前说的 一个安全的OTP 是满足 OTP_REAL = OTP_RAND的 也就是OTP的输出和均匀选择的输出是分布一样的 所以我们可以使用 随机选择代替
+
+![image-20261020195917644](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195917695.png)
+
+最后 我们把这个rand写回 公式中
+
+![image-20261020195943488](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020195943525.png)
+
+最后因为X’=X 所以这里的X’也可以替换为X 从而实现了证明
+
+![image-20261020200011671](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020200011959.png)
+
+可以发现 这里的证明过程都是非常的简单的 每一步的输出都【没有受到任何影响】所以输出概率没有影响又说明了是可交换的
+
+## 2.4.1. The three-hop maneuver
+
+我们现在聚焦于 两个可互换的内容上 而不是看整个链子
+
+![image-20261020200800152](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020200800274.png)
+
+其实可以总结为三步转换法
+
+1. 提取出 可以转化为 OTP的代码行
+2. 使用 rend 代替OTP
+3. 写回
+
+![image-20261020200959265](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261020200959393.png)
+
+那么到这里 我们就会证明 两个库 是否具有可互换性了
+
+# 2.5. Abstract cryptographic primitives
