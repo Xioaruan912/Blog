@@ -210,3 +210,96 @@ PRGs是我们学习到最简单的原语，但是也是无法使用数学无条�
 
 可以发现 我们不需要和OTP一样写出PRGs的具体算法，然后严格证明，我们只要说存在PRGs是安全的，就可以优化出一个很好的算法
 
+# 5.4.How to extend a PRG's stretch
+
+到这里我们学习了 PRG 那么我们如何增加PRG的伸缩量呢？
+
+也就是说 如果我希望扩大我的PRG伸缩量我要如何进行
+
+> 使用小伸缩量的PRG 构建出大伸缩量的PRGs
+
+这里我们假设原始的PRG 只可以把KEY 伸缩到2倍，通过分段输出的方法进行
+
+![image-20261025160054628](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160054680.png)
+
+那么同样的 我们还可以输出三倍的
+
+![image-20261025160108283](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160108310.png)
+
+请注意 这个是我们上面所说的 小伸缩量的PRG 我们需要基于上面两倍和三倍的构建出更大伸缩量的PRG
+
+## PRG 反馈构建
+
+我们可以使用PRG 反馈构建的方法 构建出较大的PRG
+
+![image-20261025160220800](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160220837.png)
+
+这里的G是我们上面所说的2倍 其实这里很好理解，我们使用两次两倍的PRG 输出，第二次的PRG的Seed 是第一次的伪随机值
+
+### 安全
+
+如果G是安全的 那么上面构造的方法也是安全的
+
+![image-20261025160335079](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160335145.png)
+
+我们如何证明上面的安全定理？
+
+其实还是通过 提取替换的方法进行证明就可以了
+
+请注意 G是安全的 基于的是Seed 是均匀选择的
+
+所以我们这里还要讨论B和均匀采样是否是不可区分性的
+
+那么我们开始证明，基于下面图片，我们开始提取 G	
+
+![image-20261025160501270](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160501304.png)
+
+我们可以得到
+
+![image-20261025160542973](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160543005.png)
+
+那么G是安全的 所以他和随机采样2λ 是不可区分性的 所以直接替换
+
+![image-20261025160611495](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160611525.png)
+
+然后写回即可，继续讨论第二个G
+
+![image-20261025160633242](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160633275.png)
+
+依旧可以使用上面的方法继续来
+
+![image-20261025160650794](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160650820.png)
+
+那么最终就得到了安全性结论
+
+![image-20261025160714299](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160714329.png)
+
+# 5.5.How to attack pseudorandomness
+
+对密码方案的一小个修改 就会导致整个密码方案变为不安全，这个是很正常的事情 ，所以我们下面讨论个不安全的方案
+
+![image-20261025160755694](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160755736.png)
+
+在这个方案中，即使G是安全的伪随机，H也是不安全的
+
+换句话说，下面两个库是可区分的
+
+![image-20261025160826574](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160826612.png)
+
+注意我们攻击的地方，我们不应该聚焦于攻击G，因为G是安全的伪随机发生器，所以我们应该聚焦于H错误的使用G
+
+我们说过 伪随机发生器要安全的，不只是架构安全，还要求每次输入的Seed都保密，并且不能多次使用
+
+那么这里成功把B泄露，那么敌手就可以基于B计算出CD
+
+我们构建下面敌手
+
+![image-20261025160956753](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261025160956782.png)
+
+他只要能够成功判断CD 就可以获得胜利
+
+在这个情况下 敌手攻击的概率始终是1
+
+那么对于均匀采样的 概率是 1/2^2λ
+
+概率不相同，并且差值不可忽略从而说明了不安全
