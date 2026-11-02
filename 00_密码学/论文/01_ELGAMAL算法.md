@@ -1,155 +1,175 @@
-# ELGAMAL算法
+# ELGAMAL 算法
 
-作者开始说明了 本篇论文基于离散对数难题的——和DH密钥分发是一样的 说明这个数学底层<span style="color: rgb(255, 32, 32);">不是</span>一个单向门限函数
+作者开始说明，本篇论文基于离散对数难题——和 DH 密钥分发一样，说明这个数学底层<span style="color: rgb(255, 32, 32);">不是</span>一个单向陷门函数。
 
-这里其实是基于DH的密钥分发系统扩展的新的基于有限域的离散对数难题的新的数字签名算法
+这里其实是基于 DH 的密钥分发系统扩展出的、基于有限域离散对数难题的加密与数字签名算法。
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22469%22%2C%22position%22%3A%7B%22pageIndex%22%3A0%2C%22rects%22%3A%5B%5B128.88%2C275.87039999999996%2C238.25457489%2C287.93399999999997%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22469%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=1">“THE PUBLIC KEY SYSTEM”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22469%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 469</a></span>)</span>
+## 公钥系统（THE PUBLIC KEY SYSTEM）
 
-和RSA一样 作者刚刚开始先介绍了 公钥体系还有DH的密钥分发
+（Elgamal, 1985, p. 469）
 
-AB需要协商一个密钥K 基于A和B自己的私钥
+和 RSA 一样，作者刚开始先介绍了公钥体系以及 DH 的密钥分发。
 
-我们设定 p是一个大素数，a是modp下的原根，那么DH密钥分发基于下面的数学计算 实现协商密钥
+A、B 需要协商一个密钥 $K$，基于 A 和 B 自己的私钥。
 
-$$
-K_{AB} \equiv a^{X_AX_B} \mod p
-$$
-
-那么 这里可以发现都是使用私钥得到的，这不现实 所以我们定义公钥为：
+设定 $p$ 是一个大素数，$a$ 是模 $p$ 的原根，那么 DH 密钥分发基于下面的数学计算实现协商密钥：
 
 $$
-Y_A \equiv a^{X_A} \mod p
+K_{AB} \equiv a^{X_A X_B} \pmod p
 $$
 
-对于B也是同理的 那么K就可以基于对方的公钥和自己的私钥进行协商了：
+那么这里可以发现都是使用私钥得到的，这不现实，所以我们定义公钥为：
 
 $$
-K_{AB} \equiv Y_{A}^{X_B} \mod p
+Y_A \equiv a^{X_A} \pmod p
 $$
 
-对于B也是同理可以生成密钥
+对于 B 也是同理。那么 $K$ 就可以基于对方的公钥和自己的私钥进行协商：
 
-攻击者无法高效计算出K 因为当前不存在高效的解决离散对数难题的算法
+$$
+K_{AB} \equiv Y_A^{X_B} \pmod p
+$$
 
-<span style="color: rgb(255, 32, 32);">只要你的系统是基于离散对数的 都要求P是一个大素数</span>
+对于 B 也可以同理生成密钥。
+
+攻击者无法高效计算出 $K$，因为当前不存在高效解决离散对数难题的算法。
+
+<span style="color: rgb(255, 32, 32);">只要你的系统是基于离散对数的，都要求 $p$ 是一个大素数；实际使用时通常还要求 $p$ 为安全素数，以避免小子群攻击。</span>
 
 ## 基于离散对数的隐私保护方案
 
-A需要给B发送一个消息M，M转为二进制在 0\~p-1之间
+A 需要给 B 发送一个消息 $M$；$M$ 被编码为 $0$ 到 $p-1$ 之间的整数。
 
-1.  A选择一个0\~p-1之间唯一的数字k，设定k为A的随机私钥
-2.  基于Y\_B 计算出协商密钥 K\_AB
-3.  生成(A的临时公钥，密文）密文对发送给用户B
-4.  用户B基于A的临时公钥 和自己的私钥 得到K
-5.  从而反向计算出M
+1. A 随机选择 $k \in \{1,\dots,p-2\}$，作为本次加密的临时私钥。
+2. 基于 $Y_B$ 计算出协商密钥 $K_{AB}$。
+3. 生成（A 的临时公钥，密文）密文对发送给用户 B。
+4. 用户 B 基于 A 的临时公钥和自己的私钥得到 $K$。
+5. 从而恢复出 $M$。
 
-从而可以基于离散对数实现隐私保护，下面是具体算法
+从而可以基于离散对数实现隐私保护。下面是具体算法。
 
-这里是计算通信密钥：$K \equiv y_{b}^{k} \mod p$ (k就是A的临时私钥）
+这里是计算通信密钥：$K \equiv Y_B^{k} \pmod p$（$k$ 就是 A 的临时私钥）。
 
-下面计算两个秘密信息c1 c2
-
-$$
-c_1 \equiv a^k \mod p
-$$
+下面计算两个秘密信息 $c_1,c_2$：
 
 $$
-c_2 \equiv Km \mod p
-$$
-
-最后组合成密文对(c\_1,c\_2)发送
-
-可以发现 使用这个方法<span style="color: rgb(255, 32, 32);">传输的密文是明文的两倍<br></span>这里还有一个保证安全的前提：<span style="background-color: rgba(255, 102, 102, 0.5);">k不允许多次使用</span>
-
-如果k被多次使用 通过简单数学运算即可恢复（下面的K是基于一个k产生的）
-
-$$
-c_1 \equiv Km_1 \mod p
+c_1 \equiv a^k \pmod p
 $$
 
 $$
-c_2 \equiv Km_2 \mod p
+c_2 \equiv K \cdot M \pmod p
 $$
 
-我们只需要进行除法即可
+最后组合成密文对 $(c_1,c_2)$ 发送。
+
+可以发现，使用这个方法<span style="color: rgb(255, 32, 32);">传输的密文是明文的两倍</span>。这里还有一个保证安全的前提：<span style="background-color: rgba(255, 102, 102, 0.5);">$k$ 不允许多次使用</span>。
+
+如果 $k$ 被多次使用，通过简单数学运算即可恢复明文。假设同一 $k$ 用于两条消息 $M_1,M_2$，对应密文分别为 $(c_{1,1},c_{2,1})$ 和 $(c_{1,2},c_{2,2})$：
 
 $$
-c_2/c_1 \equiv m_2/m_1
+c_{2,1} \equiv K M_1 \pmod p
 $$
 
- 如果我们已经知道了 m1 那么就可以非常快速的得到m2
-
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B116.88012860000002%2C653.1504%2C244.10889498600014%2C665.2139999999999%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“A DIGITALSIGNATURESCHEME”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
-
-这里是 Elgamal的比较核心的内容 也就是提出了一个新的 数字签名方案
-
-m是一个需要被签名的文件 大小为0\~p-1
-
-并且公钥依旧是通过 DH的原始生成算法实现的 ELgamal提出的算法如下：
-
 $$
-a^m \equiv y^rr^s \mod p
+c_{2,2} \equiv K M_2 \pmod p
 $$
 
-这个是整个签名核心的算法，并且对外公开(r,s)
+我们只需要进行除法即可：
 
-任何人都可以使用这个算法 还有发布者公布的 (r,s)验证签名的合法性
+$$
+\frac{c_{2,2}}{c_{2,1}} \equiv \frac{M_2}{M_1} \pmod p
+$$
 
-### <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B60.48036444%2C433.75392%2C151.9746710640001%2C444.74519999999995%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“The Signing Procedure”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
+如果已经知道 $M_1$，那么就可以非常快速地得到 $M_2$；即使不知道任一明文，也会泄露两者之间的比值关系。
 
-首先进入签名算法，主要是三个步骤组成的
+## 数字签名方案（A DIGITAL SIGNATURE SCHEME）
 
-1.  随机选择 临时私钥k，并且k要和p-1互素
-2.  计算 $r \equiv a^k \mod p$  得到 参数r
-3.  那么验证程序就可以改写为 $a^m \equiv a^{xr}a^{ks} \mod p$
-4.  因为a 是生成元，所以指数按照群的阶 p-1  来比较
-5.  计算 $s \equiv xr + ks \mod (p-1)$  得到参数s（<span style="color: rgb(255, 32, 32);">只要k和p-1互素那么这个同余式就有解</span>）
+（Elgamal, 1985, p. 470）
 
-这样就生成了 r和s，可以发送出去作为 验证密钥
+这里是 ElGamal 比较核心的内容，也就是提出了一个新的数字签名方案。
 
-### <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B59.5203534%2C230.47392%2C168.0550686540001%2C241.4652%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“The Verification Procedure”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
+$M$ 是一个需要被签名的消息，编码为 $0$ 到 $p-1$ 之间的整数。
 
-验证方得到的是 m, r, s那么可以通过上面的验证算法很简单的计算 等式是否相等
+并且公钥依旧是通过 DH 的原始生成算法实现的：$y \equiv a^x \pmod p$，其中 $x$ 是签名私钥，$y$ 是公钥。ElGamal 提出的签名算法如下：
 
-到此 整个签名和验证算法全部结束
+$$
+a^M \equiv y^r r^s \pmod p
+$$
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B90.48%2C104.5104%2C266.26659319199996%2C116.57400000000001%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“SOME ATTACKS ON THE SIGNATURE SCHEME”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
+这个是整个签名核心的算法，并且对外公开 $(r,s)$。
 
-这里作者开始讨论了一些针对本签名算法的攻击 主要是分为两类，通过公开信息恢复私钥的 还有就是通过伪造签名的
+任何人都可以使用这个算法以及发布者公布的 $(r,s)$ 验证签名的合法性。
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B320.64034236%2C602.9539199999999%2C440.42195894400004%2C613.9452%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“Attacks Aiming to Recover x”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
+### 签名过程（The Signing Procedure）
 
-这里讨论的 是 通过公开的m r s 直接攻击k尝试恢复私钥，从而破解签名算法
+（Elgamal, 1985, p. 470）
 
-但是这里遇见的问题是，即使给你多个明文密文对，你无法通过等式构建出 k的关系，也就是即使你列出一个同余方程组，但是他们之间的k是不存在关系的，也就无法联立 从而计算
+首先进入签名算法，主要由三个步骤组成：
 
-并且这里的攻击其实等价于直接攻击离散对数，我们之前说了 当下没有一个良好的算法可以高效的攻击离散对数问题，所以这里依旧无法实现
+1. 随机选择临时私钥 $k$，并且 $k$ 要和 $p-1$ 互素。
+2. 计算 $r \equiv a^k \pmod p$，得到参数 $r$。
+3. 那么验证程序就可以改写为 $a^M \equiv a^{xr} a^{ks} \pmod p$。
+4. 因为 $a$ 是生成元，所以指数按照群的阶 $p-1$ 来比较。
+5. 计算 $M \equiv xr + ks \pmod{p-1}$，从而解出 $s \equiv (M-xr)k^{-1} \pmod{p-1}$（<span style="color: rgb(255, 32, 32);">只要 $k$ 和 $p-1$ 互素，那么这个同余式就有解</span>）。
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22470%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B319.92033132%2C269.35392%2C445.90946155200004%2C280.3452%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=2">“Attacks for Forging Signatures”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22470%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 470</a></span>)</span>
+这样生成了 $r$ 和 $s$，可以发送出去作为签名。
 
-这里的攻击就是通过构造自己的r和s 从而满足之前的验证方程
+### 验证过程（The Verification Procedure）
 
-即使你r被随机选择的j所固定，你要计算出s还是要解决离散对数问题
+（Elgamal, 1985, p. 470）
 
-所以虽然 计算难度不如离散对数，但是依旧不存在多项式时间内可以攻击实现的
+验证方得到的是 $M,r,s$，那么可以通过上面的验证算法很简单地计算等式是否相等。
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22471%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B82.32%2C276.5904%2C283.1649400859999%2C288.654%5D%2C%5B94.08038661%2C265.03392%2C247.87897075200004%2C276.0252%5D%2C%5B127.20107127%2C252.79391999999999%2C221.94937867199994%2C263.7852%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=3">“PROPERTIESOF OUR SYSTEMAND COMPARISON TO OTHER SIGNATURESCHEMESAND PUBLIC KEY SYSTEMS”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 471</a></span>)</span>
+到此，整个签名和验证算法全部结束。
 
-这里与前面出现的RSA进行了一些比较
+## 对签名方案的攻击（SOME ATTACKS ON THE SIGNATURE SCHEME）
 
-说明了我们的数据规模 必须要和RSA一样大才能保证安全(RSA的n是200位十进制）
+（Elgamal, 1985, p. 470）
 
-下面阐述的是本论文提出的 密码方案和签名算法方案 新的特性
+这里作者开始讨论一些针对本签名算法的攻击，主要分为两类：通过公开信息恢复私钥，以及伪造签名。
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22471%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B321.8403534%2C680.5104%2C471.14825768400004%2C693.1452%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=3">“Properties of the Public Key System”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 471</a></span>)</span>
+### 恢复私钥的攻击（Attacks Aiming to Recover x）
 
-添加了随机私钥k 即使相同的密文，都会产生不同的密文对，p的要求和RSA中p的要求一样，但是会产生2倍的密文
+（Elgamal, 1985, p. 470）
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FBA6CPWW5%22%2C%22pageLabel%22%3A%22471%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B320.40030921%2C349.99392%2C467.19047351400013%2C360.98519999999996%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/BA6CPWW5?page=3">“Properties of the Signature Scheme”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FJSBH933Q%22%5D%2C%22locator%22%3A%22471%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/JSBH933Q">Elgamal, 1985, p. 471</a></span>)</span>
+这里讨论的是通过公开的 $M,r,s$ 直接攻击 $k$，尝试恢复私钥，从而破解签名算法。
 
-需要的参数和RSA差不多，但是签名需要文件的2倍大小
+但是这里遇见的问题是：即使给你多个消息—签名对，你也无法通过等式构建出不同 $k$ 之间的关系；也就是说，即使列出一个同余方程组，由于每次签名使用的 $k$ 相互独立，也无法联立求解。
 
-因为映射集合大小不同的存在，任何一个文件可以有很多的签名，但是一个签名只可以倍映射在一个文件中
+并且这里的攻击目前没有比直接攻击离散对数更好的方法；当下没有一个良好的算法可以高效地攻击离散对数问题，所以这里依旧无法实现。
 
-到此ELGAMAL算法结束
+### 伪造签名的攻击（Attacks for Forging Signatures）
+
+（Elgamal, 1985, p. 470）
+
+这里的攻击就是通过构造自己的 $r$ 和 $s$，从而满足之前的验证方程。
+
+即使 $r$ 被随机选择的 $k$ 固定，你要计算出 $s$ 仍然要解决离散对数问题。
+
+所以伪造签名目前仍可归约到离散对数问题，不存在多项式时间内的可行攻击。
+
+## 系统性质与比较（PROPERTIES OF OUR SYSTEM AND COMPARISON TO OTHER SIGNATURE SCHEMES AND PUBLIC KEY SYSTEMS）
+
+（Elgamal, 1985, p. 471）
+
+这里与前面出现的 RSA 进行了一些比较。
+
+说明了我们的数据规模必须要和 RSA 一样大才能保证安全（RSA 的 $n$ 是 200 位十进制）。
+
+下面阐述的是本论文提出的密码方案和签名算法方案的新特性。
+
+### 公钥系统的性质（Properties of the Public Key System）
+
+（Elgamal, 1985, p. 471）
+
+添加了随机私钥 $k$，即使相同的明文，都会产生不同的密文对；$p$ 的要求和 RSA 中 $n$ 的要求一样，但是会产生 2 倍的密文。
+
+### 签名方案的性质（Properties of the Signature Scheme）
+
+（Elgamal, 1985, p. 471）
+
+需要的参数和 RSA 差不多，但是签名需要消息的 2 倍大小。
+
+因为映射集合大小不同，同一个消息可以有很多个合法签名，但是一个签名只对应一个消息。
+
+到此 ELGAMAL 算法结束。

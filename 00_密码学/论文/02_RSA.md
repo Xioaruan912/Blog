@@ -1,216 +1,240 @@
-# RSA——<span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22120%22%2C%22position%22%3A%7B%22pageIndex%22%3A0%2C%22rects%22%3A%5B%5B56.16%2C692.12568%2C251.04957544799984%2C709.18968%5D%2C%5B56.88119212000001%2C673.88616%2C292.00880197999993%2C690.9501600000001%5D%2C%5B56.64136986%2C655.64664%2C207.52166272399992%2C672.71064%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22120%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=1">“A Method for Obtaining Digital Signatures and PublicKey Cryptosystems”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22120%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 120</a></span>)</span>
+# RSA——一种获得数字签名和公钥密码系统的方法
 
-这里开始梳理RSA原始论文
+（A Method for Obtaining Digital Signatures and Public-Key Cryptosystems，Rivest 等, 1978, p. 120）
 
-论文开始说明了 公钥密码的好处
+这里开始梳理 RSA 原始论文。
 
-1.  不需要协商密钥了，发送者公开使用对方的公钥加密自己的消息，接收者得到消息后使用私钥解密
-2.  使用私钥签名可以保证身份验证和防止否认消息
+论文开始说明了公钥密码的好处：
 
-同时介绍了 RSA是什么 基于什么数学难题的——<span style="color: rgb(255, 32, 32);">大数分解</span>
+1. 不需要协商密钥了，发送者使用对方的公钥加密自己的消息，接收者得到消息后使用私钥解密。
+2. 使用私钥签名可以保证身份验证和防止否认消息。
 
-<span style="color: rgb(255, 32, 32);">作者还说DH虽然提出了公钥密码体系，但是并没有提出任何基于原论文“单向门限函数“的具体算法</span>
+同时介绍了 RSA 是什么、基于什么数学难题——<span style="color: rgb(255, 32, 32);">大数分解</span>。
 
-RSA算是作者能想到的第一个 门限单向函数——只有得到秘密信息的人可以快速计算 否则其他人无法计算
+<span style="color: rgb(255, 32, 32);">作者还说，DH 虽然提出了公钥密码体系，但是并没有提出任何基于原论文“单向陷门函数”的具体算法。</span>
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22120%22%2C%22position%22%3A%7B%22pageIndex%22%3A0%2C%22rects%22%3A%5B%5B333.36036624%2C532.77264%2C448.5711182879996%2C541.84464%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22120%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=1">“Public-Key Cryptosystems”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22120%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 120</a></span>)</span>
+RSA 算是作者能想到的第一个陷门单向函数——只有得到秘密信息的人可以快速计算，否则其他人无法计算。
 
-作者在这里大概介绍了一下 公钥密码体系是什么
+## 公钥密码系统（Public-Key Cryptosystems）
 
-主要围绕下面四个性质进行
+（Rivest 等, 1978, p. 120）
 
-![\<img alt="" width="807" height="522" data-attachment-key="UHIMURAE" src="attachments/UHIMURAE.png" ztype="zimage"> | 807](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261012112314664.png)
+作者在这里大概介绍了一下公钥密码体系是什么。
 
-第一个可以确保加密和解密——<span style="color: rgb(255, 32, 32);">保护隐私</span>
+主要围绕下面四个性质进行：
 
-第二个是确保E和D 即公钥和私钥很容易生成
+![公钥密码系统的四个性质](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261012112314664.png)
 
-第三个是公开的E不会导致任何关于D的泄露
+第一个可以确保加密和解密——<span style="color: rgb(255, 32, 32);">保护隐私</span>。
 
-第四个是确保可以进行签名和验证签名——<span style="color: rgb(255, 32, 32);">身份认证</span>
+第二个是确保 $E$ 和 $D$（公钥和私钥）很容易生成。
 
-<span style="color: rgb(255, 32, 32);">作者还说 基于DH的论文 只要有一个算法满足 a-c 就可以说明这个函数是一个单向门限函数</span>
+第三个是公开的 $E$ 不会导致任何关于 $D$ 的泄露。
 
-单向门限函数—— 首先他是一个单向函数，从Y计算X是非常困难的，其次具有门限问题，如果一个人掌握了门限信息，那么从Y计算出X将会非常简单
+第四个是确保可以进行签名和验证签名——<span style="color: rgb(255, 32, 32);">身份认证</span>。
 
-DH的算法为：$x \longmapsto g^x \pmod p$ 计算是很容易的 但是反向计算很困难，并且没有任何额外秘密信息可以从Y计算出X——所以<span style="background-color: rgba(255, 102, 102, 0.5);">DH的密钥分发不是一个单向门限函数</span>
+<span style="color: rgb(255, 32, 32);">作者还说，基于 DH 的论文，只要有一个算法满足 a–c，就可以说明这个函数是一个单向陷门函数。</span>
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22121%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B58.0608%2C450.43224%2C110.13954829999999%2C460.58424%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22121%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=2">“Privacy”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22121%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 121</a></span>)</span>
+单向陷门函数——首先它是一个单向函数，从 $Y$ 计算 $X$ 是非常困难的；其次具有陷门，如果一个人掌握了陷门信息，那么从 $Y$ 计算出 $X$ 将会非常简单。
 
-在公钥密码提出之前 所有的经典算法都有 <span style="color: rgb(255, 32, 32);">密钥分发的苦难</span>
+DH 的算法为 $x \mapsto g^x \pmod p$，计算很容易，但是反向计算很困难，并且没有任何额外秘密信息可以从 $Y$ 计算出 $X$——所以<span style="background-color: rgba(255, 102, 102, 0.5);">DH 的密钥分发不是一个单向陷门函数</span>。
 
-公钥密码出现
+## 隐私保护（Privacy）
 
-只有在初始阶段需要他们 生成私钥和公钥，并且把公钥对外开放，可以存入公开档案中，以便交流
+（Rivest 等, 1978, p. 121）
 
-RSA文章还提出 公钥加密 允许直接在不安全的信道上传输公钥即可
+在公钥密码提出之前，所有的经典算法都有<span style="color: rgb(255, 32, 32);">密钥分发的困难</span>。
 
-因为公钥是对外开发的 敌手得到公钥 无法得到私钥的任何信息 也就没有任何作用了
+公钥密码出现后，只有在初始阶段需要生成私钥和公钥，并且把公钥对外开放，可以存入公开档案中，以便交流。
 
-RSA还提出 可以使用公钥密码体系用于建立密钥交换，使用对称加密算法进行算法加密
+RSA 文章还提出，公钥加密允许直接在不安全的信道上传输公钥即可。
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22121%22%2C%22position%22%3A%7B%22pageIndex%22%3A1%2C%22rects%22%3A%5B%5B336.23987233%2C309.07223999999997%2C379.92234472999996%2C319.22424%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22121%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=2">“Signatures”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22121%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 121</a></span>)</span>
+因为公钥是对外公开的，敌手得到公钥也无法得到私钥的任何信息，也就没有任何作用了。
 
-作者提出 以前的身份完整性存在的问题：如果收到消息，反而要去自证这个消息没有被篡改过
+RSA 还提出，可以使用公钥密码体系建立密钥交换，再使用对称加密算法进行数据加密。
 
-那么公钥算法给出了 防止这个不必要的自证的签名
+## 签名（Signatures）
 
-1.  使用发送方的私钥进行签名
-2.  发送给接收方（这里没有考虑隐私保护）
-3.  接收方使用发送方的公钥验证消息合法性
+（Rivest 等, 1978, p. 121）
 
-甚至可以附加名字在消息上，以便接收者去查找公钥
+作者提出，以前的身份完整性存在一个问题：如果收到消息，反而要去自证这个消息没有被篡改过。
 
-这样一次通信完成了两个内容
+那么公钥算法给出了防止这种不必要自证的签名：
 
-<span style="color: rgb(255, 32, 32);">防止否认消息</span>：你发送消息给我了 因为我可以使用你的公钥验证
+1. 使用发送方的私钥进行签名。
+2. 发送给接收方（这里没有考虑隐私保护）。
+3. 接收方使用发送方的公钥验证消息合法性。
 
-<span style="color: rgb(255, 32, 32);">防止篡改</span>：使用公钥验证，说明只有你的私钥可以加密，我没有任何能力修改甚至伪造
+甚至可以附加名字在消息上，以便接收者去查找公钥。
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22122%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B325.44066048%2C501.04055999999997%2C487.5589528939999%2C510.32856%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22122%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=3">“Encryption and Decryption Methods”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22122%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 122</a></span>)</span>
+这样一次通信完成了两个内容：
 
-上面只是基于DH的公钥密码体系 说明了什么是公钥密码，公钥密码可以做到什么，如何进行；下面开始对RSA算法进行具体的说明
+<span style="color: rgb(255, 32, 32);">防止否认消息</span>：你发送消息给我了，因为我可以使用你的公钥验证。
 
-下面开始RSA算法过程（忽略参数的产生）
+<span style="color: rgb(255, 32, 32);">防止篡改</span>：使用公钥验证，说明只有你的私钥可以签名，我没有任何能力修改甚至伪造。
 
-1.  M使用一个0\~n-1的整数表示，超过n就分块
-2.  初始化程序产生 公钥(e,n)，公开
-3.  计算C = M^e mod n ，这里C就是密文 发送
-4.  计算D = C^d mod n，这里D就是明文
+## 加密与解密方法（Encryption and Decryption Methods）
 
-这里就是一个RSA的通信过程
+（Rivest 等, 1978, p. 122）
 
-1.  没有对消息增加任何的附加体积——保证加密后还是原始大小
-2.  加密密钥就是一个正整数对（e,n)；解密密钥就是一个正整数对（d,n)
+上面只是基于 DH 的公钥密码体系，说明了什么是公钥密码、公钥密码可以做到什么、如何进行；下面开始对 RSA 算法进行具体说明。
 
-下面开始更加具体说明一下内容：
+下面开始 RSA 算法过程（忽略参数的产生）：
 
-1.  n = pq ，其中pq是随机产生的并且是很大的素数，然后可以公开n了，【pq需要保证私密】
-2.  开始采样d ，基于pq开始计算d，选取随机大整数，要求和(p-1)(q-1)互素 即  $gcd(d,(p-1)(q-1))=1$
-3.  开始计算e，基于pq和d，要求e是在模(p-1)(q-1)下与d的乘法逆元，即 $e*d = 1 \mod ((p-1)(q-1))$
-4.  最后公开(e,n)作为公钥，(d,n)作为私钥
+1. 明文 $M$ 使用一个 $0$ 到 $n-1$ 的整数表示；超过 $n$ 就分块。
+2. 初始化程序产生公钥 $(e,n)$，公开。
+3. 计算 $C \equiv M^e \pmod n$，这里 $C$ 就是密文，发送。
+4. 计算 $M \equiv C^d \pmod n$，这里得到的就是明文。
 
-下面阐述 <span style="color: rgb(255, 32, 32);">数学证明加密和解密的合法性</span>
+这里就是一个 RSA 的通信过程：
 
-也就是通过数学推导，让M可以被加密为C 再次复原为M
+1. 没有对消息增加任何附加体积——保证加密后还是原始大小。
+2. 加密密钥就是一个正整数对 $(e,n)$；解密密钥就是一个正整数对 $(d,n)$。
 
-欧拉定理：$M^{φ(n)} \equiv 1 (\mod n)$，<span style="color: rgb(255, 32, 32);">M和n互素</span>
+下面开始更加具体地说明：
 
-通过欧拉函数的性质可以知道
+1. $n=pq$，其中 $p,q$ 是随机产生的并且是很大的素数；然后可以公开 $n$，【$p,q$ 需要保证私密】。
+2. 采样 $d$：基于 $p,q$ 开始计算 $d$，选取随机大整数，要求和 $(p-1)(q-1)$ 互素，即 $\gcd(d,(p-1)(q-1))=1$。
+3. 计算 $e$：基于 $p,q$ 和 $d$，要求 $e$ 是在模 $(p-1)(q-1)$ 下与 $d$ 的乘法逆元，即 $ed \equiv 1 \pmod{(p-1)(q-1)}$。
+4. 最后公开 $(e,n)$ 作为公钥，$(d,n)$ 作为私钥。
 
-$$
-φ(n) = φ(pq)=φ(p)φ(q) = (p-1)(q-1)=n-(p+q)-1
-$$
+下面阐述<span style="color: rgb(255, 32, 32);">数学证明加密和解密的合法性</span>。
 
-通过上面数学基础开始证明<span style="color: rgb(255, 32, 32);">（当前假设M和n互素）</span>
+也就是通过数学推导，让 $M$ 可以被加密为 $C$，再次复原为 $M$。
 
-$$
-D(E(M))= E(D(M)) =M^{ed} (\mod n)
-$$
+欧拉定理：$M^{\varphi(n)} \equiv 1 \pmod n$，要求 <span style="color: rgb(255, 32, 32);">$M$ 和 $n$ 互素</span>。
 
-首先我们说过 ed是和(p-1)(q-1)互素 所以可以用欧拉表示
+通过欧拉函数的性质可以知道：
 
 $$
-M^{ed} \equiv M^{kφ(n)+1}(\mod n)
+\varphi(n) = \varphi(pq) = \varphi(p)\varphi(q) = (p-1)(q-1) = n-(p+q)+1
 $$
 
-我们之前知道 M和n互素，那也和p互素（p是n的因子）
-
-所以利用<span style="color: rgb(255, 32, 32);">费马小定理</span>得到
+下面开始证明。因为 $ed \equiv 1 \pmod{\varphi(n)}$，所以存在整数 $k$，使得：
 
 $$
-M^{p-1} \equiv 1(\mod n)
+ed = k\varphi(n)+1
 $$
 
- 同样q也如此
-
-那么就证明完毕了 因为：
+因此：
 
 $$
-M^{ed} \equiv M^{kφ(n)+1}(\mod n) \equiv M^{kφ(n)}M(\mod n)
+M^{ed} = M^{k\varphi(n)+1} = \left(M^{\varphi(n)}\right)^k M
 $$
 
-φ(n)化简为p-1q-1化简为1 至此证明完毕
+**先看 $M$ 与 $n$ 互素的情形。** 此时由欧拉定理 $M^{\varphi(n)} \equiv 1 \pmod n$，直接得到：
 
 $$
-M^{ed}  \equiv M(\mod n)
+M^{ed} \equiv M \pmod n
 $$
 
-从而实现数学上的加密解密证明
+**再看一般情形。** 利用中国剩余定理，只需分别证明模 $p$ 和模 $q$ 成立。
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22123%22%2C%22position%22%3A%7B%22pageIndex%22%3A3%2C%22rects%22%3A%5B%5B339.1198824%2C488.08056%2C387.1943196239999%2C497.36856%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=4">“Algorithms”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 123</a></span>)</span>
+若 $p \nmid M$，由费马小定理：
 
-这里进入了具体实现
+$$
+M^{p-1} \equiv 1 \pmod p
+$$
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22123%22%2C%22position%22%3A%7B%22pageIndex%22%3A3%2C%22rects%22%3A%5B%5B332.15991768000004%2C434.56056%2C509.49636216%2C443.84856%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=4">“How to Encrypt and Decrypt Efficiently”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 123</a></span>)</span>
+而 $p-1$ 整除 $\varphi(n)=(p-1)(q-1)$，所以 $M^{\varphi(n)} \equiv 1 \pmod p$，从而 $M^{ed} \equiv M \pmod p$。
 
-如何计算的速度非常快呢？
+若 $p \mid M$，则 $M^{ed} \equiv 0 \equiv M \pmod p$ 同样成立。
 
-我们得到了e和M并且M是二进制流
+对 $q$ 同理。于是 $M^{ed} \equiv M \pmod p$ 且 $M^{ed} \equiv M \pmod q$，由中国剩余定理得到：
 
-1.  把e展开为二进制流
+$$
+M^{ed} \equiv M \pmod n
+$$
 
-2.  设定一个变量 C 为 1
+从而实现数学上的加密解密证明。
 
-3.  使用下面的ab子程序对e的所有字节进行操作 最高位到最低位
+## 算法（Algorithms）
 
-    1.  首先计算C^2被n分解的余数 并且重载给C  $C = C^2 \mod n$
-    2.  如果当下处理的字节=1 那么设定C 作为C\*M被n分解后的余数  $C = C*M \mod n$
+（Rivest 等, 1978, p. 123）
 
-4.  现在所有的C就是M的加密后的内容
+这里进入了具体实现。
 
-上面的算法其实就是通过多次<span style="color: rgb(255, 32, 32);">平方乘</span>执行
+### 如何高效地加密和解密（How to Encrypt and Decrypt Efficiently）
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22123%22%2C%22position%22%3A%7B%22pageIndex%22%3A3%2C%22rects%22%3A%5B%5B332.88038279999995%2C81.04056%2C489.986937888%2C90.32856%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=4">“How to Find Large Prime Numbers”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22123%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 123</a></span>)</span>
+（Rivest 等, 1978, p. 123）
 
-我们了解了整个计算过程 但是最开始的pq的产生如何快速并且高效的进行？
+如何计算得速度非常快呢？
 
-首先我们确定 大素数有多大，作者认为 100位的p、q产生200位的n可以保证安全性
+我们得到了 $e$ 和 $M$，并且 $M$ 是二进制流。
 
-主要是用随机产生的 100位十进制数的素性，<span style="color: rgb(255, 32, 32);">Solovay–Strassen 素性检验</span> 还有<span style="color: rgb(255, 32, 32);">雅可比符号</span> 这里我先跳过
+1. 把 $e$ 展开为二进制流。
+2. 设定一个变量 $C$ 为 $1$。
+3. 使用下面的子程序对 $e$ 的所有比特进行操作，从最高位到最低位：
+   1. 首先计算 $C^2$ 被 $n$ 整除后的余数，并重载给 $C$：$C \leftarrow C^2 \bmod n$。
+   2. 如果当前处理的比特等于 $1$，那么设定 $C$ 为 $C \cdot M$ 被 $n$ 整除后的余数：$C \leftarrow C \cdot M \bmod n$。
+4. 现在所有的 $C$ 就是 $M$ 加密后的内容。
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22124%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B331.44030979999997%2C707.88888%2C407.53918109999995%2C716.31288%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22124%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=5">“How to Choose d”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22124%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 124</a></span>)</span>
+上面的算法其实就是通过多次<span style="color: rgb(255, 32, 32);">平方乘</span>执行。
 
-依赖于φ(n)，很容易选择出现
+### 如何寻找大素数（How to Find Large Prime Numbers）
 
-## <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22124%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B332.39957332%2C625.56888%2C490.34752092400004%2C633.99288%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22124%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=5">“H o w to Compute e from d and ,p(n)”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22124%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 124</a></span>)</span>
+（Rivest 等, 1978, p. 123）
 
-e和d在φ(n)下互为乘法逆元
+我们了解了整个计算过程，但是最开始的 $p,q$ 的产生如何快速并且高效地进行？
 
-只要先使用欧几里得除法，得到 φ(n)和d的最大公因数
+首先我们确定大素数有多大。作者认为 100 位的 $p,q$ 产生 200 位的 $n$ 可以保证安全性。
 
-并且计算过程中使用广义欧几里得除法 得到 uφ(n)+vd=1
+主要是用随机产生的 100 位十进制候选素数，<span style="color: rgb(255, 32, 32);">Solovay–Strassen 素性检验</span>以及<span style="color: rgb(255, 32, 32);">雅可比符号</span>；这里先跳过。
 
-这样mod φ(n）即可计算出e
+### 如何选择 d（How to Choose d）
 
-![\<img alt="" width="1169" height="335" data-attachment-key="LCXY37G2" src="attachments/LCXY37G2.png" ztype="zimage"> | 1169](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261012112322955.png)
+（Rivest 等, 1978, p. 124）
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22125%22%2C%22position%22%3A%7B%22pageIndex%22%3A5%2C%22rects%22%3A%5B%5B77.28%2C748.29264%2C243.8632128%2C757.36464%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22125%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=6">“Security of the Method: Cryptanalytic”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22125%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 125</a></span>)</span>
+依赖于 $\varphi(n)$，很容易选出 $d$。
 
-开始进行数学的分析安全性
+### 如何从 d 和 φ(n) 计算 e（How to Compute e from d and φ(n)）
 
-首先说明 如何证明一个算法是安全的？——只要可以抵抗密码学分析者的协同攻击，那么我们就认为这个方案是安全的（暂时的）
+（Rivest 等, 1978, p. 124）
 
-首先进行第一个方面：<span style="color: rgb(255, 32, 32);">解决n=pq的数学难题</span>
+$e$ 和 $d$ 在模 $\varphi(n)$ 下互为乘法逆元。
 
-这个内容经过300年数学家的验证，是非常困难的；没有算法可以在多项式时间内计算出结果
+只要先使用欧几里得除法，得到 $\varphi(n)$ 和 $d$ 的最大公因数。
 
-下面进行第二个方面：<span style="color: rgb(255, 32, 32);">通过公钥破解私钥</span>
+并且在计算过程中使用广义欧几里得除法，得到：
 
-<span style="color: rgb(255, 119, 0);">分解n</span>，虽然存在一些高效的算法，但是依旧很困难，使用当时最优算法破解200位的n依旧需要3.8 \* 10^9年
+$$
+u\varphi(n) + vd = 1
+$$
 
-<span style="color: rgb(255, 119, 0);">从n中计算φ(n) </span>如果一个密码分析师 可以计算出 欧拉n，那么就可以通过计算出d 从而破解算法，但是依旧困难
+这样模 $\varphi(n)$ 即可计算出 $e$（即 $e=v$）。
 
-<span style="color: rgb(255, 119, 0);">找到d‘去代替d </span>如果一个加密方案无法防止伪造密钥，更不可能是安全的
+![广义欧几里得除法](https://raw.githubusercontent.com/Xioaruan912/pic/main/20261012112322955.png)
 
-# <span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FZX54WUGS%22%2C%22pageLabel%22%3A%22126%22%2C%22position%22%3A%7B%22pageIndex%22%3A6%2C%22rects%22%3A%5B%5B73.92%2C463.30848000000003%2C296.4523759999999%2C472.81248000000005%5D%2C%5B57.36%2C451.54848%2C93.05042400000002%2C461.05248%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22126%22%7D%7D" ztype="zhighlight"><a href="zotero://open/library/items/ZX54WUGS?page=7">“Avoiding "Reblocking" when Encrypting a Signed Message”</a></span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F20501408%2Fitems%2FAU794KG9%22%5D%2C%22locator%22%3A%22126%22%7D%5D%2C%22properties%22%3A%7B%7D%7D" ztype="zcitation">(<span class="citation-item"><a href="zotero://select/library/items/AU794KG9">Rivest 等, 1978, p. 126</a></span>)</span>
+## 方法的安全性：密码分析（Security of the Method: Cryptanalytic）
 
-上面提到 对于M 我们限制长度200位，如果超过了就需要分块，但是对于 基于RSA签名算法的RSA加密，如果分块传输太过于麻烦，作者提出两个方法
+（Rivest 等, 1978, p. 125）
 
-一、每个用户都保留两个对外公开的 公钥对 一个是用于加密的 一个用于签名
+开始进行数学上的安全性分析。
 
-但是是有限制的 加密算法的n大于签名算法的n，这样就可以保证加密签名消息不用分块
+首先说明：如何证明一个算法是安全的？——只要可以抵抗密码分析者的已知攻击，那么我们就认为这个方案是安全的（暂时的）。
 
-二、<span style="color: rgb(255, 32, 32);">cycle walking（循环行走）</span>只用保留一个 公钥对 n基于h和2h之间，那么所有的M要求加密到小于n，才允许——也就是不停加密，直到小于n
+首先进行第一个方面：<span style="color: rgb(255, 32, 32);">分解 $n=pq$ 的数学难题</span>。
 
-到此为止 RSA的基础论文归纳完毕
+这个内容经过数百年数学家的研究，是非常困难的；没有算法可以在多项式时间内计算出结果。
+
+下面进行第二个方面：<span style="color: rgb(255, 32, 32);">通过公钥破解私钥</span>。
+
+<span style="color: rgb(255, 119, 0);">分解 $n$</span>：虽然存在一些高效的算法，但是依旧很困难；使用当时最优算法破解 200 位的 $n$ 依旧需要 $3.8 \times 10^9$ 年。
+
+<span style="color: rgb(255, 119, 0);">从 $n$ 中计算 $\varphi(n)$</span>：如果一个密码分析师可以计算出 $\varphi(n)$，那么就可以计算出 $d$，从而破解算法；但是依旧困难。
+
+<span style="color: rgb(255, 119, 0);">找到 $d'$ 去代替 $d$</span>：如果一个加密方案无法防止伪造密钥，更不可能是安全的。
+
+## 加密签名消息时避免“重分块”（Avoiding "Reblocking" when Encrypting a Signed Message）
+
+（Rivest 等, 1978, p. 126）
+
+上面提到，对于 $M$ 我们限制长度为 200 位十进制；如果超过了就需要分块。但是对于基于 RSA 签名算法的 RSA 加密，如果分块传输太过于麻烦，作者提出两个方法：
+
+一、每个用户都保留两个对外公开的公钥对：一个用于加密，一个用于签名。
+
+但是是有限制的：加密算法的 $n$ 大于签名算法的 $n$，这样就可以保证加密签名消息不用分块。
+
+二、<span style="color: rgb(255, 32, 32);">cycle walking（循环行走）</span>：只保留一个公钥对，$n$ 位于 $h$ 和 $2h$ 之间；那么所有的 $M$ 要求加密到小于 $n$ 才允许——也就是不停加密，直到结果小于 $n$。
+
+到此为止，RSA 的基础论文归纳完毕。
